@@ -1,0 +1,153 @@
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&display=swap"
+      rel="stylesheet"
+    />
+    <title>Godel Test</title>
+    <style>
+      @import url("https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&display=swap");
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      #container {
+        font-family: "Inter", sans-serif;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        position: absolute;
+        top: 0;
+        left: 0;
+        background: #0f0135;
+        width: 100%;
+        height: 100%;
+      }
+
+      #canvas {
+        width: 800px;
+        height: 500px;
+        background-color: #000000;
+        border-radius: 10px;
+      }
+
+      #play {
+        margin-top: 15px;
+        padding: 10px 50px;
+        background-color: #a90946;
+        color: #f5e8c7;
+        font-weight: bold;
+        font-size: 1.5rem;
+        border-radius: 3px;
+        border: none;
+      }
+
+      #play:hover {
+        background-color: #6c062d;
+        cursor: pointer;
+      }
+
+      #audioFile {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 20px;
+        padding: 10px;
+        border: none;
+        border-radius: 5px;
+        background-color: #a90946;
+        color: #f5e8c7;
+        font-weight: bold;
+        cursor: pointer;
+      }
+
+      h1,
+      h2,
+      h3 {
+        color: #f5e8c7;
+        margin: 10px;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="container">
+      <h1>Godel Technologies</h1>
+      <h2>JS Test Task (Equalizer)</h2>
+      <h3>
+        Jan 30, 2024. Made by Adilet Baimyrza
+        <a href="https://adiletbaimyrza.netlify.app/"
+          >Check out my Portfolio!</a
+        >
+      </h3>
+      <canvas id="canvas"></canvas>
+      <input type="file" id="audioFile" accept="audio/*" />
+      <button id="play">Play</button>
+    </div>
+    <script>
+      let audioUrl = null;
+      let audioSource = null;
+      let analyser = null;
+      let audioSample = null;
+      let bufferLength = null;
+      let dataArray = null;
+      let barWidth = null;
+
+      const canvas = document.getElementById("canvas");
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+      const ctx = canvas.getContext("2d");
+
+      let barHeight = null;
+      let x = 0;
+      function animate() {
+        x = 0;
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        analyser.getByteFrequencyData(dataArray);
+        let barHeight;
+        for (let i = 0; i < bufferLength; i++) {
+          barHeight = dataArray[i];
+          const red = (i * barHeight) / 10;
+          const green = i * 4;
+          const blue = barHeight / 4 - 12;
+          ctx.fillStyle = `rgb(${red}, ${green}, ${blue})`;
+          ctx.fillRect(x, canvas.height - barHeight, barWidth, barHeight);
+          x += barWidth;
+        }
+
+        requestAnimationFrame(animate);
+      }
+
+      document
+        .getElementById("audioFile")
+        .addEventListener("change", function () {
+          audioUrl = URL.createObjectURL(this.files[0]);
+
+          audioSample = new Audio();
+          audioSample.src = URL.createObjectURL(this.files[0]);
+
+          const audioCtx = new (window.AudioContext ||
+            window.webkitAudioContext)();
+
+          audioSource = audioCtx.createMediaElementSource(audioSample);
+          analyser = audioCtx.createAnalyser();
+          analyser.fftSize = 128;
+          bufferLength = analyser.frequencyBinCount;
+          dataArray = new Uint8Array(bufferLength);
+          barWidth = canvas.width / bufferLength;
+          audioSource.connect(analyser);
+          analyser.connect(audioCtx.destination);
+        });
+
+      document.getElementById("play").addEventListener("click", function () {
+        audioSample.play();
+        animate();
+      });
+    </script>
+  </body>
+</html>
