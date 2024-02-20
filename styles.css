@@ -1,0 +1,125 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+#container {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr 1fr;
+  gap: 2px;
+
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: #1d1717;
+}
+
+#left-grid-container {
+  grid-area: 1 / 1;
+}
+
+#right-grid-container {
+  grid-area: 1 / 2;
+}
+
+#bottom-left-grid-container {
+  grid-area: 2 / 1;
+}
+
+#bottom-right-grid-container {
+  grid-area: 2 / 2;
+}
+
+.grid-container {
+  display: grid;
+  grid-template-columns: repeat(64, 1fr);
+  grid-template-rows: repeat(30, 1fr);
+  gap: 2px;
+  background-color: #1d1717;
+  border-radius: 4px;
+}
+
+.grid-item {
+  transition: background-color 0.05s ease;
+  background-color: #000;
+  border-radius: 50%;
+}
+
+#controls {
+  display: flex;
+  flex-direction: column;
+  margin-left: 20px;
+}
+
+#studio {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  left: 50%;
+  top: 20px;
+  transform: translateX(-50%);
+  background-color: #251e1e;
+  border-radius: 4px;
+  padding: 20px 20px;
+  height: 140px;
+}
+
+#audio-player {
+  border-radius: 4px;
+}
+
+#audio-file {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 20px;
+  padding: 10px;
+  border: none;
+  border-radius: 5px;
+  background-color: #6b374b;
+  color: #f5e8c7;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+#songs {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-evenly;
+  background-color: #6b374b;
+  color: #f5e8c7;
+  min-width: 400px;
+  height: 100%;
+  padding: 0.5rem;
+  border-radius: 4px;
+}
+
+.icon {
+  width: 1rem;
+  height: 1rem;
+  color: inherit;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.button {
+  background: white;
+  border: none;
+  padding: 5px;
+  margin-left: 10px;
+  border-radius: 2px;
+}
+
+.button:hover {
+  box-shadow: 2px 2px 5px 1px rgb(33, 33, 33);
+}
