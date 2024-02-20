@@ -1,1 +1,1 @@
-# godel_test
+## Audio Equalizer: JS + CSS + HTML
