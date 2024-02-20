@@ -96,7 +96,7 @@ SONG_NAMES.forEach((song) => {
       audioPlayer.pause()
       audioPlayer.currentTime = 0
     }
-    audioPlayer.src = `audio/${song}.mp3`
+    audioPlayer.src = `/audio/${song}.mp3`
     const bufferLength = analyser.frequencyBinCount
     dataArray = new Uint8Array(bufferLength)
 
