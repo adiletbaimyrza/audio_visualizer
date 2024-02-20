@@ -2,93 +2,10 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/headphones.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Godel Test Improved</title>
-    <style>
-      * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-      }
-
-      #container {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        grid-template-rows: 1fr 1fr;
-        gap: 2px;
-
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background-color: #1d1717;
-      }
-
-      #left-grid-container {
-        grid-area: 1 / 1;
-      }
-
-      #right-grid-container {
-        grid-area: 1 / 2;
-      }
-
-      #bottom-left-grid-container {
-        grid-area: 2 / 1;
-      }
-
-      #bottom-right-grid-container {
-        grid-area: 2 / 2;
-      }
-
-      .grid-container {
-        display: grid;
-        grid-template-columns: repeat(64, 1fr);
-        grid-template-rows: repeat(30, 1fr);
-        gap: 2px;
-        background-color: #1d1717;
-        border-radius: 4px;
-      }
-
-      .grid-item {
-        transition: background-color 0.01s ease-in-out;
-        background-color: #000;
-        border-radius: 50%;
-      }
-
-      #studio {
-        position: absolute;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        left: 50%;
-        top: 20px;
-        transform: translateX(-50%);
-        background-color: #251e1e;
-        border-radius: 4px;
-        padding: 10px 20px;
-      }
-
-      #audio-player {
-        border-radius: 4px;
-        margin: 10px;
-      }
-
-      #audioFile {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        margin: 10px;
-        padding: 10px;
-        border: none;
-        border-radius: 5px;
-        background-color: #6b374b;
-        color: #f5e8c7;
-        font-weight: bold;
-        cursor: pointer;
-      }
-    </style>
+    <title>Audio Equalizer</title>
+    <link rel="stylesheet" type="text/css" href="styles.css" />
   </head>
   <body>
     <div id="container">
@@ -97,124 +14,29 @@
       <div class="grid-container" id="bottom-left-grid-container"></div>
       <div class="grid-container" id="bottom-right-grid-container"></div>
       <div id="studio">
-        <input type="file" id="audioFile" accept="audio/*" />
-        <audio id="audio-player" controls src=""></audio>
+        <div id="songs">
+          <div>
+            Adele - Rolling in the Deep<button class="button" id="adele">
+              <img class="icon" src="/music.svg" alt="music note icon" />
+            </button>
+          </div>
+          <div>
+            Мирбек Атабеков - Кундор жанырат<button class="button" id="mirbek">
+              <img class="icon" src="/music.svg" alt="music note icon" />
+            </button>
+          </div>
+          <div>
+            Therr Maitz, Gruppa Skryptonite - Natural Blues<button class="button" id="skryptonite">
+              <img class="icon" src="/music.svg" alt="music note icon" />
+            </button>
+          </div>
+        </div>
+        <div id="controls">
+          <input type="file" id="audio-file" accept="audio/*" />
+          <audio id="audio-player" controls src=""></audio>
+        </div>
       </div>
     </div>
-
-    <script>
-      let dataArray = null;
-
-      const ROW_LENGTH = 64;
-      const COL_LENGTH = 30;
-
-      let createGrid = (
-        gridContainerId,
-        generateId,
-        iStart,
-        iEnd,
-        jStart,
-        jEnd
-      ) => {
-        const gridContainer = document.getElementById(gridContainerId);
-        for (let i = iStart; i !== iEnd; iEnd > iStart ? i++ : i--) {
-          for (let j = jStart; j !== jEnd; jEnd > jStart ? j++ : j--) {
-            const gridItem = document.createElement("div");
-            gridItem.classList.add("grid-item");
-            gridItem.setAttribute("id", generateId(i, j));
-            gridContainer.appendChild(gridItem);
-          }
-        }
-      };
-
-      let createGrids = () => {
-        createGrid(
-          "left-grid-container",
-          (i, j) => `left-${i}-${j}`,
-          COL_LENGTH - 1,
-          -1,
-          ROW_LENGTH - 1,
-          -1
-        );
-        createGrid(
-          "right-grid-container",
-          (i, j) => `right-${i}-${j}`,
-          COL_LENGTH - 1,
-          -1,
-          0,
-          ROW_LENGTH
-        );
-        createGrid(
-          "bottom-left-grid-container",
-          (i, j) => `bottom-left-${i}-${j}`,
-          0,
-          COL_LENGTH,
-          ROW_LENGTH - 1,
-          -1
-        );
-        createGrid(
-          "bottom-right-grid-container",
-          (i, j) => `bottom-right-${i}-${j}`,
-          0,
-          COL_LENGTH,
-          0,
-          ROW_LENGTH
-        );
-      };
-
-      let getHslColor = (index, soundIntensity) => {
-        const hue = (360 / 30) * index;
-        const saturation = "100%";
-        const lightness = 50 + (soundIntensity / 30) * 50 + "%";
-        const color = `hsl(${hue}, ${saturation}, ${lightness})`;
-        return color;
-      };
-
-      let updateGrids = () => {
-        analyser.getByteFrequencyData(dataArray);
-        for (let j = 0; j < ROW_LENGTH; j++) {
-          const soundIntensity = Math.floor(dataArray[j] / 20);
-          for (let i = 0; i < COL_LENGTH; i++) {
-            const color = getHslColor(i, soundIntensity);
-            document.getElementById(`left-${i}-${j}`).style.backgroundColor =
-              i < soundIntensity ? color : "#000";
-            document.getElementById(`right-${i}-${j}`).style.backgroundColor =
-              i < soundIntensity ? color : "#000";
-            document.getElementById(
-              `bottom-left-${i}-${j}`
-            ).style.backgroundColor = i < soundIntensity ? color : "#000";
-            document.getElementById(
-              `bottom-right-${i}-${j}`
-            ).style.backgroundColor = i < soundIntensity ? color : "#000";
-          }
-        }
-        requestAnimationFrame(updateGrids);
-      };
-
-      document
-        .getElementById("audioFile")
-        .addEventListener("change", function () {
-          audioUrl = URL.createObjectURL(this.files[0]);
-          const audioPlayer = document.getElementById("audio-player");
-          audioPlayer.src = audioUrl;
-
-          const audioCtx = new (window.AudioContext ||
-            window.webkitAudioContext)();
-          const audioSource = audioCtx.createMediaElementSource(audioPlayer);
-          analyser = audioCtx.createAnalyser();
-          analyser.fftSize = 128;
-          const bufferLength = analyser.frequencyBinCount;
-          dataArray = new Uint8Array(bufferLength);
-
-          audioSource.connect(analyser);
-          analyser.connect(audioCtx.destination);
-        });
-
-      document.getElementById("audio-player").addEventListener("play", () => {
-        updateGrids();
-      });
-
-      createGrids();
-    </script>
+    <script src="main.js"></script>
   </body>
 </html>
