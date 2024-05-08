@@ -38,53 +38,45 @@
     <link rel="stylesheet" type="text/css" href="styles.css" />
   </head>
   <body>
-    <main id="container">
-      <div class="grid-container" id="left-grid-container"></div>
-      <div class="grid-container" id="right-grid-container"></div>
-      <div class="grid-container" id="bottom-left-grid-container"></div>
-      <div class="grid-container" id="bottom-right-grid-container"></div>
-      <div id="studio">
-        <div id="songs">
-          <div>
-            Adele - Rolling in the Deep<button class="button" id="adele">
-              <img class="icon" src="svg/music.svg" alt="music note icon" />
-            </button>
-          </div>
-          <div>
-            Мирбек Атабеков - Кундор жанырат<button class="button" id="mirbek">
-              <img class="icon" src="svg/music.svg" alt="music note icon" />
-            </button>
-          </div>
-          <div>
-            Therr Maitz, Gruppa Skryptonite - Natural Blues<button class="button" id="skryptonite">
-              <img class="icon" src="svg/music.svg" alt="music note icon" />
-            </button>
-          </div>
-        </div>
-        <div id="controls">
-          <input type="file" id="audio-file" accept="audio/*" />
-          <audio id="audio-player" controls src=""></audio>
-        </div>
-      </div>
+    <main class="main">
+      <section id="container">
+        <div class="grid-container" id="left-grid-container"></div>
+        <div class="grid-container" id="right-grid-container"></div>
+        <div class="grid-container" id="bottom-left-grid-container"></div>
+        <div class="grid-container" id="bottom-right-grid-container"></div>
+      </section>
 
       <section class="player">
         <div class="song">
-          <h1 class="song__name"></h1>
-          <p class="song__artist"></p>
+          <h1 class="song__name">Rolling in the Deep</h1>
+          <p class="song__artist">Adele</p>
         </div>
 
-        <div class="playback">
-          <div class="progress-bar playback__progress-bar">
-            <div class="progress-bar__filled playback__progress-bar__filled"></div>
+        <div class="controls">
+          <button id="backward-step-button" type="button" class="controls__button">
+            <img src="/svg/backward-step.svg" alt="backward-step" />
+          </button>
+          <button id="play-pause-button" type="button" class="controls__button">
+            <img src="/svg/play.svg" alt="play" />
+          </button>
+          <button id="forward-step-button" type="button" class="controls__button">
+            <img src="/svg/forward-step.svg" alt="forward-step" />
+          </button>
+
+          <div id="controls__progress-bar" class="progress-bar">
+            <div class="progress-bar__filled"></div>
           </div>
         </div>
 
         <div class="volume">
+          <img class="volume-icon" src="/svg/volume-high.svg" alt="volume-high" />
           <div class="progress-bar volume__progress-bar">
-            <div class="progress-bar__filled volume__progress-bar__filled"></div>
+            <div class="progress-bar__filled"></div>
           </div>
         </div>
       </section>
+
+      <audio id="audio-element" src="/audio/adele.mp3"></audio>
     </main>
   </body>
   <script src="main.js"></script>
