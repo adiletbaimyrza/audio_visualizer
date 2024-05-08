@@ -38,7 +38,7 @@
     <link rel="stylesheet" type="text/css" href="styles.css" />
   </head>
   <body>
-    <div id="container">
+    <main id="container">
       <div class="grid-container" id="left-grid-container"></div>
       <div class="grid-container" id="right-grid-container"></div>
       <div class="grid-container" id="bottom-left-grid-container"></div>
@@ -66,7 +66,26 @@
           <audio id="audio-player" controls src=""></audio>
         </div>
       </div>
-    </div>
+
+      <section class="player">
+        <div class="song">
+          <h1 class="song__name"></h1>
+          <p class="song__artist"></p>
+        </div>
+
+        <div class="playback">
+          <div class="progress-bar playback__progress-bar">
+            <div class="progress-bar__filled playback__progress-bar__filled"></div>
+          </div>
+        </div>
+
+        <div class="volume">
+          <div class="progress-bar volume__progress-bar">
+            <div class="progress-bar__filled volume__progress-bar__filled"></div>
+          </div>
+        </div>
+      </section>
+    </main>
   </body>
   <script src="main.js"></script>
 </html>
