@@ -1,24 +1,28 @@
-const audioElement = document.getElementById("audio-element");
+const ui = {
+  audio: document.getElementById("audio"),
+
+  playbackBtn: document.getElementById("playback-btn"),
+  forwardStepBtn: document.getElementById("forward-step-btn"),
+  backwardStepBtn: document.getElementById("backward-step-btn"),
+  controlsProgress: document.getElementById("controls__progress"),
+};
+
+ui.playbackBtn.img = ui.playbackBtn.querySelector("img");
+ui.controlsProgress.filled = ui.controlsProgress.querySelector(".progress__filled");
+
+const state = {
+  isPlaying: false,
+};
+
 const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-const audioSource = audioCtx.createMediaElementSource(audioElement);
+const audioSource = audioCtx.createMediaElementSource(ui.audio);
 let analyser = audioCtx.createAnalyser();
 analyser.fftSize = 128;
 let dataArray = new Uint8Array(analyser.frequencyBinCount);
 
 const ROW_LENGTH = 64;
 const COL_LENGTH = 30;
-const SONG_NAMES = ["adele", "mirbek", "skryptonite"];
-
-const state = {
-  isPlaying: false,
-};
-
-const playPauseButton = document.getElementById("play-pause-button");
-const playPauseButtonImage = playPauseButton.querySelector("img");
-const forwardStepButton = document.getElementById("forward-step-button");
-const backwardStepButton = document.getElementById("backward-step-button");
-const controlsProgressBar = document.getElementById("controls__progress-bar");
-const controlsProgressBarFilled = controlsProgressBar.querySelector(".progress-bar__filled");
+/* const SONG_NAMES = ["adele", "mirbek", "skryptonite"]; */
 
 let createGrid = (gridContainerId, generateId, iStart, iEnd, jStart, jEnd) => {
   const gridContainer = document.getElementById(gridContainerId);
@@ -94,83 +98,87 @@ let updateGrids = () => {
   requestAnimationFrame(updateGrids);
 };
 
-document.getElementById("audio-file").addEventListener("change", function () {
+/* document.getElementById("audio-file").addEventListener("change", function () {
   audioUrl = URL.createObjectURL(this.files[0]);
-  audioElement.src = audioUrl;
+  ui.audio.src = audioUrl;
 
   const bufferLength = analyser.frequencyBinCount;
   dataArray = new Uint8Array(bufferLength);
 
   audioSource.connect(analyser);
   analyser.connect(audioCtx.destination);
-});
+}); */
 
-SONG_NAMES.forEach((song) => {
+/* SONG_NAMES.forEach((song) => {
   document.getElementById(song).addEventListener("click", () => {
     if (audioCtx.state === "suspended") {
       audioCtx.resume();
     }
-    if (!audioElement.paused) {
-      audioElement.pause();
-      audioElement.currentTime = 0;
+    if (!ui.audio.paused) {
+      ui.audio.pause();
+      ui.audio.currentTime = 0;
     }
-    audioElement.src = `/audio/${song}.mp3`;
+    ui.audio.src = `/audio/${song}.mp3`;
     const bufferLength = analyser.frequencyBinCount;
     dataArray = new Uint8Array(bufferLength);
 
     audioSource.connect(analyser);
     analyser.connect(audioCtx.destination);
-    audioElement.play();
+    ui.audio.play();
   });
-});
+}); */
 
-document.getElementById("audio-player").addEventListener("play", () => {
+/* document.getElementById("audio-player").addEventListener("play", () => {
+  updateGrids();
+}); */
+
+ui.audio.addEventListener("play", () => {
   updateGrids();
 });
 
-audioElement.addEventListener("play", () => {
-  updateGrids();
-});
+const togglePlaybackBtn = () => {
+  ui.playbackBtn.img.src = state.isPlaying ? "/svg/pause.svg" : "/svg/play.svg";
+};
 
-playPauseButton.addEventListener("click", () => {
+ui.playbackBtn.addEventListener("click", () => {
   state.isPlaying = !state.isPlaying;
 
-  playPauseButtonImage.src = state.isPlaying ? "/svg/pause.svg" : "/svg/play.svg";
+  togglePlaybackBtn();
 
   if (state.isPlaying) {
     if (audioCtx.state === "suspended") {
       audioCtx.resume();
     }
-    if (!audioElement.paused) {
-      audioElement.pause();
-      audioElement.currentTime = 0;
-    }
     const bufferLength = analyser.frequencyBinCount;
     dataArray = new Uint8Array(bufferLength);
     audioSource.connect(analyser);
     analyser.connect(audioCtx.destination);
 
-    audioElement.play();
+    ui.audio.play();
   } else {
-    audioElement.pause();
+    ui.audio.pause();
   }
 });
 
-forwardStepButton.addEventListener("click", () => {
-  audioElement.currentTime += 15;
+ui.forwardStepBtn.addEventListener("click", () => {
+  ui.audio.currentTime += 15;
 });
 
-backwardStepButton.addEventListener("click", () => {
-  audioElement.currentTime -= 15;
+ui.backwardStepBtn.addEventListener("click", () => {
+  ui.audio.currentTime -= 15;
 });
 
-audioElement.addEventListener("timeupdate", () => {
-  progressUpdate();
+ui.audio.addEventListener("timeupdate", () => {
+  const percent = (ui.audio.currentTime / ui.audio.duration) * 100;
+  ui.controlsProgress.filled.style.flexBasis = `${percent}%`;
 });
 
-function progressUpdate() {
-  const percent = (audioElement.currentTime / audioElement.duration) * 100;
-  controlsProgressBarFilled.style.flexBasis = `${percent}%`;
-}
+ui.audio.addEventListener("ended", () => {
+  state.isPlaying = false;
+  ui.controlsProgress.filled.style.flexBasis = "0%";
+  ui.audio.currentTime = 0;
+
+  togglePlaybackBtn();
+});
 
 createGrids();

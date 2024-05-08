@@ -21,12 +21,12 @@ body {
   height: 100%;
 }
 
-.controls__button img {
+.controls__btn img {
   width: 40px;
   height: 40px;
 }
 
-.progress-bar {
+.progress {
   display: flex;
   position: relative;
   height: 6px;
@@ -38,7 +38,7 @@ body {
   overflow: hidden;
 }
 
-.progress-bar__filled {
+.progress__filled {
   height: 6px;
   background: #0e0e0e;
   flex: 0;

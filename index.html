@@ -53,30 +53,30 @@
         </div>
 
         <div class="controls">
-          <button id="backward-step-button" type="button" class="controls__button">
-            <img src="/svg/backward-step.svg" alt="backward-step" />
+          <button id="backward-step-btn" type="button" class="controls__btn">
+            <img src="/svg/backward-step.svg" alt="backward-step icon" />
           </button>
-          <button id="play-pause-button" type="button" class="controls__button">
-            <img src="/svg/play.svg" alt="play" />
+          <button id="playback-btn" type="button" class="controls__btn">
+            <img src="/svg/play.svg" alt="play icon" />
           </button>
-          <button id="forward-step-button" type="button" class="controls__button">
-            <img src="/svg/forward-step.svg" alt="forward-step" />
+          <button id="forward-step-btn" type="button" class="controls__btn">
+            <img src="/svg/forward-step.svg" alt="forward-step icon" />
           </button>
 
-          <div id="controls__progress-bar" class="progress-bar">
-            <div class="progress-bar__filled"></div>
+          <div id="controls__progress" class="progress">
+            <div class="progress__filled"></div>
           </div>
         </div>
 
         <div class="volume">
           <img class="volume-icon" src="/svg/volume-high.svg" alt="volume-high" />
-          <div class="progress-bar volume__progress-bar">
-            <div class="progress-bar__filled"></div>
+          <div id="volume__progress" class="progress">
+            <div class="progress__filled"></div>
           </div>
         </div>
       </section>
 
-      <audio id="audio-element" src="/audio/adele.mp3"></audio>
+      <audio id="audio" src="/audio/adele.mp3"></audio>
     </main>
   </body>
   <script src="main.js"></script>
