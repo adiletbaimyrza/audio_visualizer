@@ -1,13 +1,13 @@
 const ui = {
   audio: document.getElementById("audio"),
 
-  playbackBtn: document.getElementById("playback-btn"),
+  playBtn: document.getElementById("play-btn"),
+  pauseBtn: document.getElementById("pause-btn"),
   forwardStepBtn: document.getElementById("forward-step-btn"),
   backwardStepBtn: document.getElementById("backward-step-btn"),
   controlsProgress: document.getElementById("controls__progress"),
 };
 
-ui.playbackBtn.img = ui.playbackBtn.querySelector("img");
 ui.controlsProgress.filled = ui.controlsProgress.querySelector(".progress__filled");
 
 const state = {
@@ -137,10 +137,36 @@ ui.audio.addEventListener("play", () => {
 });
 
 const togglePlaybackBtn = () => {
-  ui.playbackBtn.img.src = state.isPlaying ? "/svg/pause.svg" : "/svg/play.svg";
+  if (state.isPlaying) {
+    ui.playBtn.classList.add("hidden");
+    ui.pauseBtn.classList.remove("hidden");
+  } else {
+    ui.playBtn.classList.remove("hidden");
+    ui.pauseBtn.classList.add("hidden");
+  }
 };
 
-ui.playbackBtn.addEventListener("click", () => {
+ui.playBtn.addEventListener("click", () => {
+  state.isPlaying = !state.isPlaying;
+
+  togglePlaybackBtn();
+
+  if (state.isPlaying) {
+    if (audioCtx.state === "suspended") {
+      audioCtx.resume();
+    }
+    const bufferLength = analyser.frequencyBinCount;
+    dataArray = new Uint8Array(bufferLength);
+    audioSource.connect(analyser);
+    analyser.connect(audioCtx.destination);
+
+    ui.audio.play();
+  } else {
+    ui.audio.pause();
+  }
+});
+
+ui.pauseBtn.addEventListener("click", () => {
   state.isPlaying = !state.isPlaying;
 
   togglePlaybackBtn();
@@ -182,3 +208,4 @@ ui.audio.addEventListener("ended", () => {
 });
 
 createGrids();
+togglePlaybackBtn();

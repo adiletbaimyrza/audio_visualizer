@@ -14,6 +14,10 @@ body {
   width: 100%;
 }
 
+.hidden {
+  display: none;
+}
+
 .main {
   display: flex;
   flex-direction: column;
