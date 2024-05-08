@@ -5,13 +5,13 @@ const ui = {
   forwardBtn: document.getElementById("forward-btn"),
   backwardBtn: document.getElementById("backward-btn"),
   controlsProgress: document.getElementById("controls-progress"),
-  volumeProgress: document.getElementById("volume__progress"),
+  volumeProgress: document.getElementById("volume-progress"),
   currentDuration: document.getElementById("current-duration"),
   totalDuration: document.getElementById("total-duration"),
 };
 
-ui.controlsProgress.filled = ui.controlsProgress.querySelector(".progress__filled");
-ui.volumeProgress.filled = ui.volumeProgress.querySelector(".progress__filled");
+ui.controlsProgress.filled = ui.controlsProgress.querySelector(".progress-filled");
+ui.volumeProgress.filled = ui.volumeProgress.querySelector(".progress-filled");
 
 const state = {
   isPlaying: false,
@@ -25,7 +25,6 @@ let dataArray = new Uint8Array(analyser.frequencyBinCount);
 
 const ROW_LENGTH = 64;
 const COL_LENGTH = 30;
-/* const SONG_NAMES = ["adele", "mirbek", "skryptonite"]; */
 
 let createGrid = (gridContainerId, generateId, iStart, iEnd, jStart, jEnd) => {
   const gridContainer = document.getElementById(gridContainerId);
@@ -40,38 +39,10 @@ let createGrid = (gridContainerId, generateId, iStart, iEnd, jStart, jEnd) => {
 };
 
 let createGrids = () => {
-  createGrid(
-    "left-grid-container",
-    (i, j) => `left-${i}-${j}`,
-    COL_LENGTH - 1,
-    -1,
-    ROW_LENGTH - 1,
-    -1
-  );
-  createGrid(
-    "right-grid-container",
-    (i, j) => `right-${i}-${j}`,
-    COL_LENGTH - 1,
-    -1,
-    0,
-    ROW_LENGTH
-  );
-  createGrid(
-    "bottom-left-grid-container",
-    (i, j) => `bottom-left-${i}-${j}`,
-    0,
-    COL_LENGTH,
-    ROW_LENGTH - 1,
-    -1
-  );
-  createGrid(
-    "bottom-right-grid-container",
-    (i, j) => `bottom-right-${i}-${j}`,
-    0,
-    COL_LENGTH,
-    0,
-    ROW_LENGTH
-  );
+  createGrid("left-grid-container", (i, j) => `left-${i}-${j}`, COL_LENGTH - 1, -1, ROW_LENGTH - 1, -1);
+  createGrid("right-grid-container", (i, j) => `right-${i}-${j}`, COL_LENGTH - 1, -1, 0, ROW_LENGTH);
+  createGrid("bottom-left-grid-container", (i, j) => `bottom-left-${i}-${j}`, 0, COL_LENGTH, ROW_LENGTH - 1, -1);
+  createGrid("bottom-right-grid-container", (i, j) => `bottom-right-${i}-${j}`, 0, COL_LENGTH, 0, ROW_LENGTH);
 };
 
 let getHslColor = (index, soundIntensity) => {
@@ -88,52 +59,14 @@ let updateGrids = () => {
     const soundIntensity = Math.floor(dataArray[j] / 20);
     for (let i = 0; i < COL_LENGTH; i++) {
       const color = getHslColor(i, soundIntensity);
-      document.getElementById(`left-${i}-${j}`).style.backgroundColor =
-        i < soundIntensity ? color : "#000";
-      document.getElementById(`right-${i}-${j}`).style.backgroundColor =
-        i < soundIntensity ? color : "#000";
-      document.getElementById(`bottom-left-${i}-${j}`).style.backgroundColor =
-        i < soundIntensity ? color : "#000";
-      document.getElementById(`bottom-right-${i}-${j}`).style.backgroundColor =
-        i < soundIntensity ? color : "#000";
+      document.getElementById(`left-${i}-${j}`).style.backgroundColor = i < soundIntensity ? color : "#000";
+      document.getElementById(`right-${i}-${j}`).style.backgroundColor = i < soundIntensity ? color : "#000";
+      document.getElementById(`bottom-left-${i}-${j}`).style.backgroundColor = i < soundIntensity ? color : "#000";
+      document.getElementById(`bottom-right-${i}-${j}`).style.backgroundColor = i < soundIntensity ? color : "#000";
     }
   }
   requestAnimationFrame(updateGrids);
 };
-
-/* document.getElementById("audio-file").addEventListener("change", function () {
-  audioUrl = URL.createObjectURL(this.files[0]);
-  ui.audio.src = audioUrl;
-
-  const bufferLength = analyser.frequencyBinCount;
-  dataArray = new Uint8Array(bufferLength);
-
-  audioSource.connect(analyser);
-  analyser.connect(audioCtx.destination);
-}); */
-
-/* SONG_NAMES.forEach((song) => {
-  document.getElementById(song).addEventListener("click", () => {
-    if (audioCtx.state === "suspended") {
-      audioCtx.resume();
-    }
-    if (!ui.audio.paused) {
-      ui.audio.pause();
-      ui.audio.currentTime = 0;
-    }
-    ui.audio.src = `/audio/${song}.mp3`;
-    const bufferLength = analyser.frequencyBinCount;
-    dataArray = new Uint8Array(bufferLength);
-
-    audioSource.connect(analyser);
-    analyser.connect(audioCtx.destination);
-    ui.audio.play();
-  });
-}); */
-
-/* document.getElementById("audio-player").addEventListener("play", () => {
-  updateGrids();
-}); */
 
 ui.audio.addEventListener("play", () => {
   updateGrids();
@@ -200,6 +133,10 @@ ui.controlsProgress.addEventListener("mousemove", (e) => controlsMousedown && co
 ui.controlsProgress.addEventListener("mousedown", () => (controlsMousedown = true));
 ui.controlsProgress.addEventListener("mouseup", () => (controlsMousedown = false));
 
+const gainNode = audioCtx.createGain();
+
+audioSource.connect(gainNode).connect(audioCtx.destination);
+
 ui.forwardBtn.addEventListener("click", () => {
   ui.audio.currentTime += 15;
 });
@@ -224,11 +161,19 @@ ui.audio.addEventListener("ended", () => {
 });
 
 const updateDurations = () => {
-  ui.currentDuration.textContent = new Date(ui.audio.currentTime * 1000)
-    .toISOString()
-    .slice(15, 19);
-  ui.totalDuration.textContent = new Date(ui.audio.duration * 1000).toISOString().slice(15, 19);
+  const currentMinutes = Math.floor(ui.audio.currentTime / 60);
+  const currentSeconds = Math.floor(ui.audio.currentTime % 60);
+  ui.currentDuration.textContent = `${currentMinutes}:${currentSeconds < 10 ? "0" : ""}${currentSeconds}`;
+
+  const totalMinutes = Math.floor(ui.audio.duration / 60);
+  const totalSeconds = Math.floor(ui.audio.duration % 60);
+  ui.totalDuration.textContent = `${totalMinutes}:${totalSeconds < 10 ? "0" : ""}${totalSeconds}`;
 };
+
+ui.audio.addEventListener("loadedmetadata", () => {
+  updateDurations();
+});
 
 createGrids();
 togglePlaybackBtn();
+updateDurations();

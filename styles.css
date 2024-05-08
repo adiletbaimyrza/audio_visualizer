@@ -29,12 +29,21 @@ body {
 
 .player {
   display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
+  grid-template-columns: repeat(12, 1fr);
   background-color: var(--black);
   color: var(--white);
   width: 100%;
+  padding: 20px 50px;
+
+  .song {
+    grid-column: span 3;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
 
   .controls {
+    grid-column: span 6;
     display: flex;
     flex-direction: column;
 
@@ -54,24 +63,25 @@ body {
       }
       #play-btn {
         scale: 1.2;
-        margin: 30px 40px;
+        margin: 0 40px 20px 40px;
       }
       #pause-btn {
         scale: 1.2;
-        margin: 30px 40px;
+        margin: 0 40px 20px 40px;
       }
       #forward-btn {
         scale: 0.7;
+        margin-bottom: 20px;
       }
       #backward-btn {
         scale: 0.7;
+        margin-bottom: 20px;
       }
     }
 
     .controls__progress {
       display: flex;
       align-items: center;
-      margin-bottom: 30px;
 
       #controls-progress {
         margin: 0 10px;
@@ -82,6 +92,23 @@ body {
         font-size: 14px;
         color: var(--grey);
       }
+    }
+  }
+
+  .volume {
+    grid-column: span 3;
+    display: flex;
+    align-items: center;
+    justify-content: right;
+
+    img {
+      width: 40px;
+      height: 40px;
+      scale: 0.7;
+    }
+
+    #volume-progress {
+      max-width: 150px;
     }
   }
 }
@@ -109,7 +136,7 @@ body {
   overflow: hidden;
 }
 
-.progress__filled {
+.progress-filled {
   height: 6px;
   background: var(--white);
   flex: 0;

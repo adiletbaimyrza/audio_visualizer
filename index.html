@@ -15,14 +15,8 @@
       property="og:description"
       content="An audio visualizer built using HTML, CSS, and plain JavaScript. Web Audio API was ised to analyze audio frequencies in real-time and dynamically update a grid-based visualization based on the intensity of different frequency bands. User can upload his own audio files or select from a predefined list os songs chosen by me."
     />
-    <meta
-      property="og:image"
-      content="https://adiletbaimyrza.github.io/audio_equalizer/blob/screenshot.png"
-    />
-    <meta
-      property="og:url"
-      content="https://adiletbaimyrza.github.io/audio_equalizer/blob/screenshot.png"
-    />
+    <meta property="og:image" content="https://adiletbaimyrza.github.io/audio_equalizer/blob/screenshot.png" />
+    <meta property="og:url" content="https://adiletbaimyrza.github.io/audio_equalizer/blob/screenshot.png" />
 
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content="Audio Equalizer" />
@@ -30,10 +24,7 @@
       name="twitter:description"
       content="An audio visualizer built using HTML, CSS, and plain JavaScript. Web Audio API was ised to analyze audio frequencies in real-time and dynamically update a grid-based visualization based on the intensity of different frequency bands. User can upload his own audio files or select from a predefined list os songs chosen by me."
     />
-    <meta
-      name="twitter:image"
-      content="https://adiletbaimyrza.github.io/audio_equalizer/blob/screenshot.png"
-    />
+    <meta name="twitter:image" content="https://adiletbaimyrza.github.io/audio_equalizer/blob/screenshot.png" />
     <title>Audio Equalizer</title>
     <link rel="stylesheet" type="text/css" href="styles.css" />
   </head>
@@ -67,20 +58,21 @@
               <img src="/svg/forward.svg" alt="forward-step icon" />
             </button>
           </div>
+
           <div class="controls__progress">
-            <time id="current-duration">00:00</time>
+            <time id="current-duration"></time>
             <div id="controls-progress" class="progress">
-              <div class="progress__filled"></div>
+              <div class="progress-filled"></div>
             </div>
-            <time id="total-duration">3:15</time>
+            <time id="total-duration"></time>
           </div>
         </div>
 
         <div class="volume">
-          <img class="volume-icon" src="/svg/volume-high.svg" alt="volume-high" />
-          <div id="volume__progress" class="progress">
-            <div class="progress__filled"></div>
-          </div>
+          <img src="/svg/volume-high.svg" alt="volume-high" />
+          <input min="0" max="1" step="0.01" id="volume-progress" class="progress">
+            <div class="progress-filled"></div>
+          </input>
         </div>
       </section>
 
