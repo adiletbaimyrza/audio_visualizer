@@ -2,10 +2,12 @@ const ui = {
   audio: document.getElementById("audio"),
   playBtn: document.getElementById("play-btn"),
   pauseBtn: document.getElementById("pause-btn"),
-  forwardStepBtn: document.getElementById("forward-step-btn"),
-  backwardStepBtn: document.getElementById("backward-step-btn"),
+  forwardBtn: document.getElementById("forward-btn"),
+  backwardBtn: document.getElementById("backward-btn"),
   controlsProgress: document.getElementById("controls-progress"),
   volumeProgress: document.getElementById("volume__progress"),
+  currentDuration: document.getElementById("current-duration"),
+  totalDuration: document.getElementById("total-duration"),
 };
 
 ui.controlsProgress.filled = ui.controlsProgress.querySelector(".progress__filled");
@@ -198,17 +200,19 @@ ui.controlsProgress.addEventListener("mousemove", (e) => controlsMousedown && co
 ui.controlsProgress.addEventListener("mousedown", () => (controlsMousedown = true));
 ui.controlsProgress.addEventListener("mouseup", () => (controlsMousedown = false));
 
-ui.forwardStepBtn.addEventListener("click", () => {
+ui.forwardBtn.addEventListener("click", () => {
   ui.audio.currentTime += 15;
 });
 
-ui.backwardStepBtn.addEventListener("click", () => {
+ui.backwardBtn.addEventListener("click", () => {
   ui.audio.currentTime -= 15;
 });
 
 ui.audio.addEventListener("timeupdate", () => {
   const percent = (ui.audio.currentTime / ui.audio.duration) * 100;
   ui.controlsProgress.filled.style.flexBasis = `${percent}%`;
+
+  updateDurations();
 });
 
 ui.audio.addEventListener("ended", () => {
@@ -218,6 +222,13 @@ ui.audio.addEventListener("ended", () => {
 
   togglePlaybackBtn();
 });
+
+const updateDurations = () => {
+  ui.currentDuration.textContent = new Date(ui.audio.currentTime * 1000)
+    .toISOString()
+    .slice(15, 19);
+  ui.totalDuration.textContent = new Date(ui.audio.duration * 1000).toISOString().slice(15, 19);
+};
 
 createGrids();
 togglePlaybackBtn();

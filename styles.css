@@ -8,6 +8,7 @@ button {
 :root {
   --black: #191414;
   --white: #ffffff;
+  --grey: #808080;
 }
 
 * {
@@ -51,10 +52,6 @@ body {
       .controls-btn:active {
         opacity: 0.5;
       }
-
-      #backward-step-btn {
-        scale: 0.7;
-      }
       #play-btn {
         scale: 1.2;
         margin: 30px 40px;
@@ -63,18 +60,27 @@ body {
         scale: 1.2;
         margin: 30px 40px;
       }
-      #forward-step-btn {
+      #forward-btn {
         scale: 0.7;
       }
-      #backward-step-btn {
+      #backward-btn {
         scale: 0.7;
       }
     }
 
     .controls__progress {
+      display: flex;
+      align-items: center;
+      margin-bottom: 30px;
+
       #controls-progress {
-        grid-area: progress;
-        margin-bottom: 30px;
+        margin: 0 10px;
+      }
+
+      #current-duration,
+      #total-duration {
+        font-size: 14px;
+        color: var(--grey);
       }
     }
   }
@@ -95,7 +101,7 @@ body {
   display: flex;
   position: relative;
   height: 6px;
-  background: #a3a3a3;
+  background: var(--grey);
   border-radius: 25px;
   margin: 0 5px;
   flex: 10;

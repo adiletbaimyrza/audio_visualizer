@@ -54,8 +54,8 @@
 
         <div class="controls">
           <div class="controls__btns">
-            <button id="backward-step-btn" type="button" class="controls-btn">
-              <img src="/svg/backward-step.svg" alt="backward-step icon" />
+            <button id="backward-btn" type="button" class="controls-btn">
+              <img src="/svg/backward.svg" alt="backward-step icon" />
             </button>
             <button id="play-btn" type="button" class="controls-btn playback-btn">
               <img src="/svg/play.svg" alt="play icon" />
@@ -63,14 +63,16 @@
             <button id="pause-btn" type="button" class="controls-btn playback-btn">
               <img src="/svg/pause.svg" alt="play icon" />
             </button>
-            <button id="forward-step-btn" type="button" class="controls-btn">
-              <img src="/svg/forward-step.svg" alt="forward-step icon" />
+            <button id="forward-btn" type="button" class="controls-btn">
+              <img src="/svg/forward.svg" alt="forward-step icon" />
             </button>
           </div>
           <div class="controls__progress">
+            <time id="current-duration">00:00</time>
             <div id="controls-progress" class="progress">
               <div class="progress__filled"></div>
             </div>
+            <time id="total-duration">3:15</time>
           </div>
         </div>
 
