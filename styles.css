@@ -1,3 +1,15 @@
+/* ----- CSS Reset ----- */
+button {
+  background: unset;
+  border: unset;
+}
+/* ----- CSS Reset ----- */
+
+:root {
+  --black: #191414;
+  --white: #ffffff;
+}
+
 * {
   margin: 0;
   padding: 0;
@@ -14,6 +26,60 @@ body {
   width: 100%;
 }
 
+.player {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  background-color: var(--black);
+  color: var(--white);
+  width: 100%;
+
+  .controls {
+    display: flex;
+    flex-direction: column;
+
+    .controls__btns {
+      display: flex;
+      justify-content: center;
+
+      .controls-btn {
+        cursor: pointer;
+        img {
+          width: 40px;
+          height: 40px;
+        }
+      }
+      .controls-btn:active {
+        opacity: 0.5;
+      }
+
+      #backward-step-btn {
+        scale: 0.7;
+      }
+      #play-btn {
+        scale: 1.2;
+        margin: 30px 40px;
+      }
+      #pause-btn {
+        scale: 1.2;
+        margin: 30px 40px;
+      }
+      #forward-step-btn {
+        scale: 0.7;
+      }
+      #backward-step-btn {
+        scale: 0.7;
+      }
+    }
+
+    .controls__progress {
+      #controls-progress {
+        grid-area: progress;
+        margin-bottom: 30px;
+      }
+    }
+  }
+}
+
 .hidden {
   display: none;
 }
@@ -23,11 +89,6 @@ body {
   flex-direction: column;
   width: 100%;
   height: 100%;
-}
-
-.controls__btn img {
-  width: 40px;
-  height: 40px;
 }
 
 .progress {
@@ -44,7 +105,7 @@ body {
 
 .progress__filled {
   height: 6px;
-  background: #0e0e0e;
+  background: var(--white);
   flex: 0;
   flex-basis: 0%;
   border-radius: 25px;
@@ -97,59 +158,6 @@ body {
   margin-left: 20px;
 }
 
-#studio {
-  position: absolute;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  left: 50%;
-  top: 20px;
-  transform: translateX(-50%);
-  background-color: #251e1e;
-  border-radius: 4px;
-  padding: 20px 20px;
-  height: 140px;
-}
-
-#audio-player {
-  border-radius: 4px;
-}
-
-#audio-file {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-bottom: 20px;
-  padding: 10px;
-  border: none;
-  border-radius: 5px;
-  background-color: #6b374b;
-  color: #f5e8c7;
-  font-weight: bold;
-  cursor: pointer;
-}
-
-#songs {
-  display: flex;
-  flex-direction: column;
-  justify-content: space-evenly;
-  background-color: #6b374b;
-  color: #f5e8c7;
-  min-width: 400px;
-  height: 100%;
-  padding: 0.5rem;
-  border-radius: 4px;
-}
-
-.icon {
-  width: 1rem;
-  height: 1rem;
-  color: inherit;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
 .button {
   background: white;
   border: none;
@@ -160,13 +168,6 @@ body {
 
 .button:hover {
   box-shadow: 2px 2px 5px 1px rgb(33, 33, 33);
-}
-
-.player {
-  display: flex;
-  justify-content: space-between;
-  height: 200px;
-  width: 100%;
 }
 
 .volume-icon {

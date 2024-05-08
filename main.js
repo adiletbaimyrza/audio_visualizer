@@ -1,14 +1,15 @@
 const ui = {
   audio: document.getElementById("audio"),
-
   playBtn: document.getElementById("play-btn"),
   pauseBtn: document.getElementById("pause-btn"),
   forwardStepBtn: document.getElementById("forward-step-btn"),
   backwardStepBtn: document.getElementById("backward-step-btn"),
-  controlsProgress: document.getElementById("controls__progress"),
+  controlsProgress: document.getElementById("controls-progress"),
+  volumeProgress: document.getElementById("volume__progress"),
 };
 
 ui.controlsProgress.filled = ui.controlsProgress.querySelector(".progress__filled");
+ui.volumeProgress.filled = ui.volumeProgress.querySelector(".progress__filled");
 
 const state = {
   isPlaying: false,
@@ -155,8 +156,7 @@ ui.playBtn.addEventListener("click", () => {
     if (audioCtx.state === "suspended") {
       audioCtx.resume();
     }
-    const bufferLength = analyser.frequencyBinCount;
-    dataArray = new Uint8Array(bufferLength);
+
     audioSource.connect(analyser);
     analyser.connect(audioCtx.destination);
 
@@ -175,8 +175,7 @@ ui.pauseBtn.addEventListener("click", () => {
     if (audioCtx.state === "suspended") {
       audioCtx.resume();
     }
-    const bufferLength = analyser.frequencyBinCount;
-    dataArray = new Uint8Array(bufferLength);
+
     audioSource.connect(analyser);
     analyser.connect(audioCtx.destination);
 
@@ -185,6 +184,19 @@ ui.pauseBtn.addEventListener("click", () => {
     ui.audio.pause();
   }
 });
+
+let controlsMousedown = false;
+let volumeMousedown = false;
+
+function controlsScrub(event) {
+  const scrubTime = (event.offsetX / ui.controlsProgress.offsetWidth) * ui.audio.duration;
+  ui.audio.currentTime = scrubTime;
+}
+
+ui.controlsProgress.addEventListener("click", controlsScrub);
+ui.controlsProgress.addEventListener("mousemove", (e) => controlsMousedown && controlsScrub(e));
+ui.controlsProgress.addEventListener("mousedown", () => (controlsMousedown = true));
+ui.controlsProgress.addEventListener("mouseup", () => (controlsMousedown = false));
 
 ui.forwardStepBtn.addEventListener("click", () => {
   ui.audio.currentTime += 15;
