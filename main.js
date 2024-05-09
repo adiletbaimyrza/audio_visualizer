@@ -24,7 +24,7 @@ analyser.fftSize = 128;
 let dataArray = new Uint8Array(analyser.frequencyBinCount);
 
 const ROW_LENGTH = 64;
-const COL_LENGTH = 30;
+const COL_LENGTH = 25;
 
 let createGrid = (gridContainerId, generateId, iStart, iEnd, jStart, jEnd) => {
   const gridContainer = document.getElementById(gridContainerId);
@@ -132,10 +132,12 @@ ui.controlsProgress.addEventListener("click", controlsScrub);
 ui.controlsProgress.addEventListener("mousemove", (e) => controlsMousedown && controlsScrub(e));
 ui.controlsProgress.addEventListener("mousedown", () => (controlsMousedown = true));
 ui.controlsProgress.addEventListener("mouseup", () => (controlsMousedown = false));
+ui.controlsProgress.addEventListener("mouseleave", () => (controlsMousedown = false));
 
-const gainNode = audioCtx.createGain();
-
-audioSource.connect(gainNode).connect(audioCtx.destination);
+ui.volumeProgress.addEventListener("input", () => {
+  ui.audio.volume = ui.volumeProgress.value;
+  console.log(ui.volumeProgress.value);
+});
 
 ui.forwardBtn.addEventListener("click", () => {
   ui.audio.currentTime += 15;

@@ -173,7 +173,7 @@ body {
 .grid-container {
   display: grid;
   grid-template-columns: repeat(64, 1fr);
-  grid-template-rows: repeat(30, 1fr);
+  grid-template-rows: repeat(25, 1fr);
   gap: 2px;
   background-color: #1d1717;
   border-radius: 4px;
