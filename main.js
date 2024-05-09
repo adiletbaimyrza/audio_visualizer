@@ -134,10 +134,18 @@ ui.controlsProgress.addEventListener("mousedown", () => (controlsMousedown = tru
 ui.controlsProgress.addEventListener("mouseup", () => (controlsMousedown = false));
 ui.controlsProgress.addEventListener("mouseleave", () => (controlsMousedown = false));
 
-ui.volumeProgress.addEventListener("input", () => {
-  ui.audio.volume = ui.volumeProgress.value;
-  console.log(ui.volumeProgress.value);
-});
+function volumeScrub(event) {
+  console.log("volume clicked");
+  ui.audio.volume = event.offsetX / ui.volumeProgress.offsetWidth;
+  const percent = ui.audio.volume * 100;
+  ui.volumeProgress.filled.style.flexBasis = `${percent}%`;
+}
+
+ui.volumeProgress.addEventListener("click", volumeScrub);
+ui.volumeProgress.addEventListener("mousemove", (e) => volumeMousedown && volumeScrub(e));
+ui.volumeProgress.addEventListener("mousedown", () => (volumeMousedown = true));
+ui.volumeProgress.addEventListener("mouseup", () => (volumeMousedown = false));
+ui.volumeProgress.addEventListener("mouseleave", () => (volumeMousedown = false));
 
 ui.forwardBtn.addEventListener("click", () => {
   ui.audio.currentTime += 15;
