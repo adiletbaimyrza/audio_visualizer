@@ -1,36 +1,167 @@
+// ----- CONSTANTS ----- //
+const cnst = {
+  ROW_LEN: 64,
+  COL_LEN: 25,
+  FFT_SIZE: 128,
+};
+
+// ----- REFERENCES TO UI ELEMENTS ----- //
 const ui = {
+  // audio
   audio: document.getElementById("audio"),
+  // buttons
   playBtn: document.getElementById("play-btn"),
   pauseBtn: document.getElementById("pause-btn"),
   forwardBtn: document.getElementById("forward-btn"),
   backwardBtn: document.getElementById("backward-btn"),
   volumeHighBtn: document.getElementById("volume-high-btn"),
   mutedBtn: document.getElementById("muted-btn"),
-  controlsProgress: document.getElementById("controls-progress"),
+  // progress bars
+  songProgress: document.getElementById("controls-progress"),
   volumeProgress: document.getElementById("volume-progress"),
-  currentDuration: document.getElementById("current-duration"),
+  // durations
+  currDuration: document.getElementById("current-duration"),
   totalDuration: document.getElementById("total-duration"),
 };
 
-ui.controlsProgress.filled = ui.controlsProgress.querySelector(".progress-filled");
+// references to the children of durations
+ui.songProgress.filled = ui.songProgress.querySelector(".progress-filled");
 ui.volumeProgress.filled = ui.volumeProgress.querySelector(".progress-filled");
 
+// ----- STATES AND SETTERS ----- //
+// initialize states with default values
 const state = {
   isPlaying: false,
+  setIsPlaying: (newVal) => {
+    state.isPlaying = newVal;
+  },
   isMuted: false,
-  prevVolume: ui.audio.volume,
+  setIsMuted: (newVal) => {
+    state.isMuted = newVal;
+  },
+  currVolume: ui.audio.volume,
+  setCurrVolume: (newVal) => {
+    state.currVolume = newVal;
+  },
+  songProgMousedown: false,
+  setSongProgMousedown: (newVal) => {
+    state.songProgMousedown = newVal;
+  },
+  volumeProgMousedown: false,
+  setVolumeProgMousedown: (newVal) => {
+    state.volumeProgMousedown = newVal;
+  },
 };
 
-const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+// ----- INITIALIZE AUDIO CONTEXT, ANALYSER, AND DATA_ARRAY ----- //
+const audioCtx = new window.AudioContext();
 const audioSource = audioCtx.createMediaElementSource(ui.audio);
-let analyser = audioCtx.createAnalyser();
-analyser.fftSize = 128;
-let dataArray = new Uint8Array(analyser.frequencyBinCount);
+const analyser = audioCtx.createAnalyser();
+analyser.fftSize = cnst.FFT_SIZE;
+const dataArray = new Uint8Array(analyser.frequencyBinCount);
 
-const ROW_LENGTH = 64;
-const COL_LENGTH = 25;
+// ----- EVENT HANDLERS ----- //
+// audio event handlers
+ui.audio.addEventListener("play", () => {
+  updateGrids();
+});
 
-let createGrid = (gridContainerId, generateId, iStart, iEnd, jStart, jEnd) => {
+ui.audio.addEventListener("timeupdate", () => {
+  updateProgress(ui.songProgress, (ui.audio.currentTime / ui.audio.duration) * 100);
+
+  updateDurations();
+});
+
+ui.audio.addEventListener("ended", () => {
+  state.isPlaying = false;
+
+  updateProgress(ui.songProgress, 0);
+
+  ui.audio.currentTime = 0;
+
+  togglePlaybackBtn();
+});
+
+// button event handlers
+ui.playBtn.addEventListener("click", () => {
+  state.setIsPlaying(true);
+
+  togglePlaybackBtn();
+
+  if (audioCtx.state === "suspended") {
+    audioCtx.resume();
+  }
+
+  audioSource.connect(analyser);
+  analyser.connect(audioCtx.destination);
+
+  ui.audio.play();
+});
+
+ui.pauseBtn.addEventListener("click", () => {
+  state.setIsPlaying(false);
+
+  togglePlaybackBtn();
+
+  ui.audio.pause();
+});
+
+ui.forwardBtn.addEventListener("click", () => {
+  ui.audio.currentTime += 15;
+});
+
+ui.backwardBtn.addEventListener("click", () => {
+  ui.audio.currentTime -= 15;
+});
+
+ui.volumeHighBtn.addEventListener("click", () => {
+  state.setIsMuted(true);
+
+  ui.audio.volume = 0;
+
+  updateProgress(ui.volumeProgress, 0);
+
+  toggleVolumeBtn();
+});
+
+ui.mutedBtn.addEventListener("click", () => {
+  state.setIsMuted(false);
+
+  ui.audio.volume = state.currVolume;
+
+  updateProgress(ui.volumeProgress, ui.audio.volume * 100);
+
+  toggleVolumeBtn();
+});
+
+// progress bar event handlers
+const songScrub = (event) => {
+  const scrubTime = (event.offsetX / ui.songProgress.offsetWidth) * ui.audio.duration;
+  ui.audio.currentTime = scrubTime;
+};
+
+ui.songProgress.addEventListener("click", songScrub);
+ui.songProgress.addEventListener("mousemove", (e) => state.songProgMousedown && songScrub(e));
+ui.songProgress.addEventListener("mousedown", () => state.setSongProgMousedown(true));
+ui.songProgress.addEventListener("mouseup", () => state.setSongProgMousedown(false));
+ui.songProgress.addEventListener("mouseleave", () => state.setSongProgMousedown(false));
+
+const volumeScrub = (event) => {
+  ui.audio.volume = event.offsetX / ui.volumeProgress.offsetWidth;
+
+  state.setCurrVolume(ui.audio.volume);
+
+  updateProgress(ui.volumeProgress, ui.audio.volume * 100);
+};
+
+ui.volumeProgress.addEventListener("click", volumeScrub);
+ui.volumeProgress.addEventListener("mousemove", (e) => state.volumeProgMousedown && volumeScrub(e));
+ui.volumeProgress.addEventListener("mousedown", () => state.setVolumeProgMousedown(true));
+ui.volumeProgress.addEventListener("mouseup", () => state.setVolumeProgMousedown(false));
+ui.volumeProgress.addEventListener("mouseleave", () => state.setVolumeProgMousedown(false));
+
+// ----- GRID CREATION FUNCTIONS ----- //
+const createGrid = (gridContainerId, generateId, iStart, iEnd, jStart, jEnd) => {
   const gridContainer = document.getElementById(gridContainerId);
   for (let i = iStart; i !== iEnd; iEnd > iStart ? i++ : i--) {
     for (let j = jStart; j !== jEnd; jEnd > jStart ? j++ : j--) {
@@ -41,27 +172,24 @@ let createGrid = (gridContainerId, generateId, iStart, iEnd, jStart, jEnd) => {
     }
   }
 };
-
-let createGrids = () => {
-  createGrid("left-grid-container", (i, j) => `left-${i}-${j}`, COL_LENGTH - 1, -1, ROW_LENGTH - 1, -1);
-  createGrid("right-grid-container", (i, j) => `right-${i}-${j}`, COL_LENGTH - 1, -1, 0, ROW_LENGTH);
-  createGrid("bottom-left-grid-container", (i, j) => `bottom-left-${i}-${j}`, 0, COL_LENGTH, ROW_LENGTH - 1, -1);
-  createGrid("bottom-right-grid-container", (i, j) => `bottom-right-${i}-${j}`, 0, COL_LENGTH, 0, ROW_LENGTH);
+const createGrids = () => {
+  createGrid("left-grid-container", (i, j) => `left-${i}-${j}`, cnst.COL_LEN - 1, -1, cnst.ROW_LEN - 1, -1);
+  createGrid("right-grid-container", (i, j) => `right-${i}-${j}`, cnst.COL_LEN - 1, -1, 0, cnst.ROW_LEN);
+  createGrid("bottom-left-grid-container", (i, j) => `bottom-left-${i}-${j}`, 0, cnst.COL_LEN, cnst.ROW_LEN - 1, -1);
+  createGrid("bottom-right-grid-container", (i, j) => `bottom-right-${i}-${j}`, 0, cnst.COL_LEN, 0, cnst.ROW_LEN);
 };
-
-let getHslColor = (index, soundIntensity) => {
+const getHslColor = (index, soundIntensity) => {
   const hue = (360 / 30) * index;
   const saturation = "100%";
   const lightness = 50 + (soundIntensity / 30) * 50 + "%";
   const color = `hsl(${hue}, ${saturation}, ${lightness})`;
   return color;
 };
-
-let updateGrids = () => {
+const updateGrids = () => {
   analyser.getByteFrequencyData(dataArray);
-  for (let j = 0; j < ROW_LENGTH; j++) {
+  for (let j = 0; j < cnst.ROW_LEN; j++) {
     const soundIntensity = Math.floor(dataArray[j] / 20);
-    for (let i = 0; i < COL_LENGTH; i++) {
+    for (let i = 0; i < cnst.COL_LEN; i++) {
       const color = getHslColor(i, soundIntensity);
       document.getElementById(`left-${i}-${j}`).style.backgroundColor = i < soundIntensity ? color : "#000";
       document.getElementById(`right-${i}-${j}`).style.backgroundColor = i < soundIntensity ? color : "#000";
@@ -72,17 +200,14 @@ let updateGrids = () => {
   requestAnimationFrame(updateGrids);
 };
 
-ui.audio.addEventListener("play", () => {
-  updateGrids();
-});
-
+// ----- HELPER FUNCTIONS ----- //
 const togglePlaybackBtn = () => {
   if (state.isPlaying) {
-    ui.playBtn.classList.add("hidden");
-    ui.pauseBtn.classList.remove("hidden");
+    ui.playBtn.style.display = "none";
+    ui.pauseBtn.style.display = "block";
   } else {
-    ui.playBtn.classList.remove("hidden");
-    ui.pauseBtn.classList.add("hidden");
+    ui.playBtn.style.display = "block";
+    ui.pauseBtn.style.display = "none";
   }
 };
 
@@ -96,131 +221,33 @@ const toggleVolumeBtn = () => {
   }
 };
 
-ui.playBtn.addEventListener("click", () => {
-  state.isPlaying = !state.isPlaying;
-
-  togglePlaybackBtn();
-
-  if (state.isPlaying) {
-    if (audioCtx.state === "suspended") {
-      audioCtx.resume();
-    }
-
-    audioSource.connect(analyser);
-    analyser.connect(audioCtx.destination);
-
-    ui.audio.play();
-  } else {
-    ui.audio.pause();
-  }
-});
-
-ui.pauseBtn.addEventListener("click", () => {
-  state.isPlaying = !state.isPlaying;
-
-  togglePlaybackBtn();
-
-  if (state.isPlaying) {
-    if (audioCtx.state === "suspended") {
-      audioCtx.resume();
-    }
-
-    audioSource.connect(analyser);
-    analyser.connect(audioCtx.destination);
-
-    ui.audio.play();
-  } else {
-    ui.audio.pause();
-  }
-});
-
-ui.volumeHighBtn.addEventListener("click", () => {
-  state.isMuted = !state.isMuted;
-
-  ui.audio.volume = 0;
-
-  const percent = ui.audio.volume * 100;
-  ui.volumeProgress.filled.style.flexBasis = `${percent}%`;
-  toggleVolumeBtn();
-});
-ui.mutedBtn.addEventListener("click", () => {
-  state.isMuted = !state.isMuted;
-
-  ui.audio.volume = state.prevVolume;
-
-  const percent = ui.audio.volume * 100;
-  ui.volumeProgress.filled.style.flexBasis = `${percent}%`;
-  toggleVolumeBtn();
-});
-
-let controlsMousedown = false;
-let volumeMousedown = false;
-
-function controlsScrub(event) {
-  const scrubTime = (event.offsetX / ui.controlsProgress.offsetWidth) * ui.audio.duration;
-  ui.audio.currentTime = scrubTime;
-}
-
-ui.controlsProgress.addEventListener("click", controlsScrub);
-ui.controlsProgress.addEventListener("mousemove", (e) => controlsMousedown && controlsScrub(e));
-ui.controlsProgress.addEventListener("mousedown", () => (controlsMousedown = true));
-ui.controlsProgress.addEventListener("mouseup", () => (controlsMousedown = false));
-ui.controlsProgress.addEventListener("mouseleave", () => (controlsMousedown = false));
-
-function volumeScrub(event) {
-  console.log("volume clicked");
-  ui.audio.volume = event.offsetX / ui.volumeProgress.offsetWidth;
-  state.prevVolume = ui.audio.volume;
-  const percent = ui.audio.volume * 100;
-  ui.volumeProgress.filled.style.flexBasis = `${percent}%`;
-}
-
-ui.volumeProgress.addEventListener("click", volumeScrub);
-ui.volumeProgress.addEventListener("mousemove", (e) => volumeMousedown && volumeScrub(e));
-ui.volumeProgress.addEventListener("mousedown", () => (volumeMousedown = true));
-ui.volumeProgress.addEventListener("mouseup", () => (volumeMousedown = false));
-ui.volumeProgress.addEventListener("mouseleave", () => (volumeMousedown = false));
-
-ui.forwardBtn.addEventListener("click", () => {
-  ui.audio.currentTime += 15;
-});
-
-ui.backwardBtn.addEventListener("click", () => {
-  ui.audio.currentTime -= 15;
-});
-
-ui.audio.addEventListener("timeupdate", () => {
-  const percent = (ui.audio.currentTime / ui.audio.duration) * 100;
-  ui.controlsProgress.filled.style.flexBasis = `${percent}%`;
-
-  updateDurations();
-});
-
-ui.audio.addEventListener("ended", () => {
-  state.isPlaying = false;
-  ui.controlsProgress.filled.style.flexBasis = "0%";
-  ui.audio.currentTime = 0;
-
-  togglePlaybackBtn();
-});
-
 const updateDurations = () => {
   const currentMinutes = Math.floor(ui.audio.currentTime / 60);
   const currentSeconds = Math.floor(ui.audio.currentTime % 60);
-  ui.currentDuration.textContent = `${currentMinutes}:${currentSeconds < 10 ? "0" : ""}${currentSeconds}`;
+  ui.currDuration.textContent = `${currentMinutes}:${currentSeconds < 10 ? "0" : ""}${currentSeconds}`;
 
   const totalMinutes = Math.floor(ui.audio.duration / 60);
   const totalSeconds = Math.floor(ui.audio.duration % 60);
   ui.totalDuration.textContent = `${totalMinutes}:${totalSeconds < 10 ? "0" : ""}${totalSeconds}`;
 };
 
-ui.audio.addEventListener("loadedmetadata", () => {
-  updateDurations();
-});
+const updateProgress = (progress, percent) => {
+  progress.filled.style.flexBasis = `${percent}%`;
+};
 
-createGrids();
-togglePlaybackBtn();
-toggleVolumeBtn();
-updateDurations();
-const percent = ui.audio.volume * 100;
-ui.volumeProgress.filled.style.flexBasis = `${percent}%`;
+// ----- APP INITIALIZATION FUNCTION ----- //
+const initializeApp = () => {
+  createGrids();
+
+  togglePlaybackBtn();
+  toggleVolumeBtn();
+
+  ui.audio.addEventListener("loadedmetadata", () => {
+    updateDurations();
+  });
+
+  updateProgress(ui.volumeProgress, ui.audio.volume * 100);
+};
+
+// ----- INITIALIZE APP ----- //
+initializeApp();
