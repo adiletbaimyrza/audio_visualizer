@@ -4,6 +4,8 @@ const ui = {
   pauseBtn: document.getElementById("pause-btn"),
   forwardBtn: document.getElementById("forward-btn"),
   backwardBtn: document.getElementById("backward-btn"),
+  volumeHighBtn: document.getElementById("volume-high-btn"),
+  mutedBtn: document.getElementById("muted-btn"),
   controlsProgress: document.getElementById("controls-progress"),
   volumeProgress: document.getElementById("volume-progress"),
   currentDuration: document.getElementById("current-duration"),
@@ -15,6 +17,8 @@ ui.volumeProgress.filled = ui.volumeProgress.querySelector(".progress-filled");
 
 const state = {
   isPlaying: false,
+  isMuted: false,
+  prevVolume: ui.audio.volume,
 };
 
 const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -82,6 +86,16 @@ const togglePlaybackBtn = () => {
   }
 };
 
+const toggleVolumeBtn = () => {
+  if (state.isMuted) {
+    ui.volumeHighBtn.style.display = "none";
+    ui.mutedBtn.style.display = "flex";
+  } else {
+    ui.volumeHighBtn.style.display = "flex";
+    ui.mutedBtn.style.display = "none";
+  }
+};
+
 ui.playBtn.addEventListener("click", () => {
   state.isPlaying = !state.isPlaying;
 
@@ -120,6 +134,25 @@ ui.pauseBtn.addEventListener("click", () => {
   }
 });
 
+ui.volumeHighBtn.addEventListener("click", () => {
+  state.isMuted = !state.isMuted;
+
+  ui.audio.volume = 0;
+
+  const percent = ui.audio.volume * 100;
+  ui.volumeProgress.filled.style.flexBasis = `${percent}%`;
+  toggleVolumeBtn();
+});
+ui.mutedBtn.addEventListener("click", () => {
+  state.isMuted = !state.isMuted;
+
+  ui.audio.volume = state.prevVolume;
+
+  const percent = ui.audio.volume * 100;
+  ui.volumeProgress.filled.style.flexBasis = `${percent}%`;
+  toggleVolumeBtn();
+});
+
 let controlsMousedown = false;
 let volumeMousedown = false;
 
@@ -137,6 +170,7 @@ ui.controlsProgress.addEventListener("mouseleave", () => (controlsMousedown = fa
 function volumeScrub(event) {
   console.log("volume clicked");
   ui.audio.volume = event.offsetX / ui.volumeProgress.offsetWidth;
+  state.prevVolume = ui.audio.volume;
   const percent = ui.audio.volume * 100;
   ui.volumeProgress.filled.style.flexBasis = `${percent}%`;
 }
@@ -186,4 +220,7 @@ ui.audio.addEventListener("loadedmetadata", () => {
 
 createGrids();
 togglePlaybackBtn();
+toggleVolumeBtn();
 updateDurations();
+const percent = ui.audio.volume * 100;
+ui.volumeProgress.filled.style.flexBasis = `${percent}%`;
