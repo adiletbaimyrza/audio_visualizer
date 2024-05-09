@@ -130,10 +130,6 @@ body {
   }
 }
 
-.hidden {
-  display: none;
-}
-
 .main {
   display: flex;
   flex-direction: column;
