@@ -5,6 +5,29 @@ const cnst = {
   FFT_SIZE: 128,
 };
 
+const songs = [
+  {
+    name: "Rolling in the Deep",
+    artist: "Adele",
+    slug: "adele",
+  },
+  {
+    name: "Oбійми",
+    artist: "Oкеан Eльзи",
+    slug: "okean-elzy",
+  },
+  {
+    name: "Алдадын",
+    artist: "Мирбек Атабеков",
+    slug: "mirbek",
+  },
+  {
+    name: "Кукла колдуна",
+    artist: "Король и Шут ",
+    slug: "korol-i-shut",
+  },
+];
+
 // ----- REFERENCES TO UI ELEMENTS ----- //
 const ui = {
   // audio
@@ -22,6 +45,8 @@ const ui = {
   // durations
   currDuration: document.getElementById("current-duration"),
   totalDuration: document.getElementById("total-duration"),
+
+  songs: document.getElementById("songs"),
 };
 
 // references to the children of durations
@@ -248,6 +273,35 @@ const initializeApp = () => {
 
   updateProgress(ui.volumeProgress, ui.audio.volume * 100);
 };
+
+let songsHtml = "";
+songs.forEach((song) => {
+  songsHtml += `
+  <button id="${song.slug}" class="songs__song">
+    <div class="now-playing">
+      <span></span>
+      <span></span>
+      <span></span>
+    </div>
+    <img src="/posters/${song.slug}.jpg" alt="${song.name} by ${song.artist}" />
+    <h1>${song.name}</h1>
+    <p>${song.artist}</p>
+  </button>
+  `;
+});
+ui.songs.innerHTML = songsHtml;
+
+songs.forEach((song) => {
+  document.getElementById(song.slug).addEventListener("click", () => {
+    if (!ui.audio.paused) {
+      ui.audio.pause();
+      ui.audio.currentTime = 0;
+    }
+    ui.audio.src = `/audio/${song.slug}.mp3`;
+
+    ui.audio.play();
+  });
+});
 
 // ----- INITIALIZE APP ----- //
 initializeApp();

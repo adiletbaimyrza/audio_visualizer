@@ -7,6 +7,7 @@ button {
 
 :root {
   --black: #191414;
+  --lighter-black: #2a2424;
   --white: #ffffff;
   --grey: #808080;
 }
@@ -130,6 +131,76 @@ body {
   }
 }
 
+.songs {
+  position: absolute;
+  border-radius: 10px;
+  left: 10px;
+  bottom: 140px;
+  display: flex;
+  flex-direction: column;
+  background-color: var(--black);
+
+  .songs__song {
+    display: flex;
+    align-items: center;
+    color: var(--white);
+    text-align: left;
+    padding: 20px 50px;
+
+    .now-playing {
+      position: relative;
+      right: 20px;
+      display: flex;
+      justify-content: space-between;
+      width: 20px;
+      height: 20px;
+
+      span {
+        width: 4px;
+        height: 100%;
+        background-color: rgb(17, 212, 115);
+        border-radius: 3px;
+        transform-origin: bottom;
+        animation: bounce 2.2s ease infinite alternate;
+        content: "";
+
+        &:nth-of-type(2) {
+          animation-delay: -2.2s; /* Start at the end of animation */
+        }
+
+        &:nth-of-type(3) {
+          animation-delay: -3.7s; /* Start mid-way of return of animation */
+        }
+      }
+    }
+
+    img {
+      height: 40px;
+      width: 40px;
+      border-radius: 5px;
+      margin-right: 10px;
+    }
+
+    h1 {
+      width: 250px;
+    }
+  }
+
+  .songs__song:first-child {
+    border-top-right-radius: 10px;
+    border-top-left-radius: 10px;
+  }
+
+  .songs__song:last-child {
+    border-bottom-right-radius: 10px;
+    border-bottom-left-radius: 10px;
+  }
+
+  .songs__song:hover {
+    background-color: var(--lighter-black);
+  }
+}
+
 .main {
   display: flex;
   flex-direction: column;
@@ -219,4 +290,26 @@ body {
 .volume-icon {
   width: 40px;
   height: 40px;
+}
+
+@keyframes bounce {
+  10% {
+    transform: scaleY(0.3);
+  }
+
+  30% {
+    transform: scaleY(1);
+  }
+
+  60% {
+    transform: scaleY(0.5);
+  }
+
+  80% {
+    transform: scaleY(0.75);
+  }
+
+  100% {
+    transform: scaleY(0.6);
+  }
 }
