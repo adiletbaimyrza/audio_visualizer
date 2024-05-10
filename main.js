@@ -10,21 +10,25 @@ const songs = [
     name: "Rolling in the Deep",
     artist: "Adele",
     slug: "adele",
+    duration: "3:53",
   },
   {
     name: "Oбійми",
     artist: "Oкеан Eльзи",
     slug: "okean-elzy",
+    duration: "3:44",
   },
   {
     name: "Алдадын",
     artist: "Мирбек Атабеков",
     slug: "mirbek",
+    duration: "3:36",
   },
   {
     name: "Кукла колдуна",
     artist: "Король и Шут ",
     slug: "korol-i-shut",
+    duration: "3:22",
   },
 ];
 
@@ -47,11 +51,17 @@ const ui = {
   totalDuration: document.getElementById("total-duration"),
 
   songs: document.getElementById("songs"),
+
+  currSong: document.getElementById("song"),
 };
 
 // references to the children of durations
 ui.songProgress.filled = ui.songProgress.querySelector(".progress-filled");
 ui.volumeProgress.filled = ui.volumeProgress.querySelector(".progress-filled");
+
+ui.currSong.poster = ui.currSong.querySelector("#song-poster");
+ui.currSong.name = ui.currSong.querySelector("#song-name");
+ui.currSong.artist = ui.currSong.querySelector("#song-artist");
 
 // ----- STATES AND SETTERS ----- //
 // initialize states with default values
@@ -284,8 +294,11 @@ songs.forEach((song) => {
       <span></span>
     </div>
     <img src="/posters/${song.slug}.jpg" alt="${song.name} by ${song.artist}" />
-    <h1>${song.name}</h1>
-    <p>${song.artist}</p>
+    <div class="song-title">
+      <h3>${song.name}</h3>
+      <p>${song.artist}</p>
+    </div>
+    <p class="song-duration">${song.duration}</p>
   </button>
   `;
 });
@@ -293,12 +306,22 @@ ui.songs.innerHTML = songsHtml;
 
 songs.forEach((song) => {
   document.getElementById(song.slug).addEventListener("click", () => {
-    if (!ui.audio.paused) {
-      ui.audio.pause();
-      ui.audio.currentTime = 0;
-    }
     ui.audio.src = `/audio/${song.slug}.mp3`;
 
+    ui.currSong.poster.src = `/posters/${song.slug}.jpg`;
+    ui.currSong.poster.alt = `${song.name} by ${song.artist}`;
+    ui.currSong.name.textContent = `${song.name}`;
+    ui.currSong.artist.textContent = song.artist;
+
+    if (audioCtx.state === "suspended") {
+      audioCtx.resume();
+    }
+
+    state.setIsPlaying(true);
+    togglePlaybackBtn();
+
+    audioSource.connect(analyser);
+    analyser.connect(audioCtx.destination);
     ui.audio.play();
   });
 });
