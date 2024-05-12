@@ -86,6 +86,10 @@ const state = {
   setVolumeProgMousedown: (newVal) => {
     state.volumeProgMousedown = newVal;
   },
+  nowPlaying: null,
+  setNowPlaying: (newVal) => {
+    state.nowPlaying = newVal;
+  },
 };
 
 // ----- INITIALIZE AUDIO CONTEXT, ANALYSER, AND DATA_ARRAY ----- //
@@ -288,7 +292,7 @@ let songsHtml = "";
 songs.forEach((song) => {
   songsHtml += `
   <button id="${song.slug}" class="songs__song">
-    <div class="now-playing">
+    <div id="${song.slug}-now-playing" class="now-playing">
       <span></span>
       <span></span>
       <span></span>
@@ -323,8 +327,19 @@ songs.forEach((song) => {
     audioSource.connect(analyser);
     analyser.connect(audioCtx.destination);
     ui.audio.play();
+
+    if (state.nowPlaying != null) {
+      state.nowPlaying.style.display = "none";
+    }
+    document.getElementById(`${song.slug}-now-playing`).style.display = "flex";
+    state.nowPlaying = document.getElementById(`${song.slug}-now-playing`);
   });
 });
+
+ui.currSong.poster.src = `/posters/${songs[0].slug}.jpg`;
+ui.currSong.poster.alt = `${songs[0].name} by ${songs[0].artist}`;
+ui.currSong.name.textContent = `${songs[0].name}`;
+ui.currSong.artist.textContent = songs[0].artist;
 
 // ----- INITIALIZE APP ----- //
 initializeApp();
