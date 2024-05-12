@@ -49,16 +49,16 @@ const ui = {
   // durations
   currDuration: document.getElementById("current-duration"),
   totalDuration: document.getElementById("total-duration"),
-
-  songs: document.getElementById("songs"),
-
+  // playlist
+  playlist: document.getElementById("playlist"),
+  // current song
   currSong: document.getElementById("song"),
 };
 
 // references to the children of durations
 ui.songProgress.filled = ui.songProgress.querySelector(".progress-filled");
 ui.volumeProgress.filled = ui.volumeProgress.querySelector(".progress-filled");
-
+// references to the children of current song
 ui.currSong.poster = ui.currSong.querySelector("#song-poster");
 ui.currSong.name = ui.currSong.querySelector("#song-name");
 ui.currSong.artist = ui.currSong.querySelector("#song-artist");
@@ -98,6 +98,32 @@ const audioSource = audioCtx.createMediaElementSource(ui.audio);
 const analyser = audioCtx.createAnalyser();
 analyser.fftSize = cnst.FFT_SIZE;
 const dataArray = new Uint8Array(analyser.frequencyBinCount);
+
+const populatePlaylist = () => {
+  let songsHtml = "";
+
+  songs.forEach((song) => {
+    songsHtml += `
+    <button id="${song.slug}" class="playlist__song">
+      <div id="${song.slug}-now-playing" class="now-playing">
+        <span></span>
+        <span></span>
+        <span></span>
+      </div>
+      <img src="/posters/${song.slug}.jpg" alt="${song.name} by ${song.artist}" />
+      <div class="song-title">
+        <h3>${song.name}</h3>
+        <p>${song.artist}</p>
+      </div>
+      <p class="song-duration">${song.duration}</p>
+    </button>
+    `;
+  });
+
+  ui.playlist.innerHTML = songsHtml;
+};
+// ----- POPULATE PLAYLIST TABLE ----- //
+populatePlaylist();
 
 // ----- EVENT HANDLERS ----- //
 // audio event handlers
@@ -260,6 +286,15 @@ const toggleVolumeBtn = () => {
   }
 };
 
+const toggleNowPlaying = (animatingElement) => {
+  if (state.nowPlaying != null) {
+    state.nowPlaying.style.display = "none";
+  }
+
+  animatingElement.style.display = "flex";
+  state.nowPlaying = animatingElement;
+};
+
 const updateDurations = () => {
   const currentMinutes = Math.floor(ui.audio.currentTime / 60);
   const currentSeconds = Math.floor(ui.audio.currentTime % 60);
@@ -286,27 +321,9 @@ const initializeApp = () => {
   });
 
   updateProgress(ui.volumeProgress, ui.audio.volume * 100);
-};
 
-let songsHtml = "";
-songs.forEach((song) => {
-  songsHtml += `
-  <button id="${song.slug}" class="songs__song">
-    <div id="${song.slug}-now-playing" class="now-playing">
-      <span></span>
-      <span></span>
-      <span></span>
-    </div>
-    <img src="/posters/${song.slug}.jpg" alt="${song.name} by ${song.artist}" />
-    <div class="song-title">
-      <h3>${song.name}</h3>
-      <p>${song.artist}</p>
-    </div>
-    <p class="song-duration">${song.duration}</p>
-  </button>
-  `;
-});
-ui.songs.innerHTML = songsHtml;
+  initializeCurrSongData();
+};
 
 songs.forEach((song) => {
   document.getElementById(song.slug).addEventListener("click", () => {
@@ -328,18 +345,16 @@ songs.forEach((song) => {
     analyser.connect(audioCtx.destination);
     ui.audio.play();
 
-    if (state.nowPlaying != null) {
-      state.nowPlaying.style.display = "none";
-    }
-    document.getElementById(`${song.slug}-now-playing`).style.display = "flex";
-    state.nowPlaying = document.getElementById(`${song.slug}-now-playing`);
+    toggleNowPlaying(document.getElementById(`${song.slug}-now-playing`));
   });
 });
 
-ui.currSong.poster.src = `/posters/${songs[0].slug}.jpg`;
-ui.currSong.poster.alt = `${songs[0].name} by ${songs[0].artist}`;
-ui.currSong.name.textContent = `${songs[0].name}`;
-ui.currSong.artist.textContent = songs[0].artist;
+const initializeCurrSongData = () => {
+  ui.currSong.poster.src = `/posters/${songs[0].slug}.jpg`;
+  ui.currSong.poster.alt = `${songs[0].name} by ${songs[0].artist}`;
+  ui.currSong.name.textContent = `${songs[0].name}`;
+  ui.currSong.artist.textContent = songs[0].artist;
+};
 
 // ----- INITIALIZE APP ----- //
 initializeApp();

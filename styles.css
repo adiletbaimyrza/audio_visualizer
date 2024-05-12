@@ -149,7 +149,7 @@ body {
   }
 }
 
-.songs {
+.playlist {
   position: absolute;
   border-radius: 10px;
   left: 10px;
@@ -158,7 +158,7 @@ body {
   flex-direction: column;
   background-color: var(--black);
 
-  .songs__song {
+  .playlist__song {
     display: flex;
     align-items: center;
     color: var(--white);
@@ -215,17 +215,17 @@ body {
     }
   }
 
-  .songs__song:first-child {
+  .playlist__song:first-child {
     border-top-right-radius: 10px;
     border-top-left-radius: 10px;
   }
 
-  .songs__song:last-child {
+  .playlist__song:last-child {
     border-bottom-right-radius: 10px;
     border-bottom-left-radius: 10px;
   }
 
-  .songs__song:hover {
+  .playlist__song:hover {
     background-color: var(--lighter-black);
   }
 }
