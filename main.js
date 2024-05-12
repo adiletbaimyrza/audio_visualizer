@@ -5,6 +5,7 @@ const cnst = {
   FFT_SIZE: 128,
 };
 
+// ----- SONGS ----- //
 const songs = [
   {
     name: "Rolling in the Deep",
@@ -36,23 +37,23 @@ const songs = [
 const ui = {
   // audio
   audio: document.getElementById("audio"),
-  // buttons
+  // player buttons
   playBtn: document.getElementById("play-btn"),
   pauseBtn: document.getElementById("pause-btn"),
   forwardBtn: document.getElementById("forward-btn"),
   backwardBtn: document.getElementById("backward-btn"),
   volumeHighBtn: document.getElementById("volume-high-btn"),
   mutedBtn: document.getElementById("muted-btn"),
-  // progress bars
+  // player progress bars
   songProgress: document.getElementById("controls-progress"),
   volumeProgress: document.getElementById("volume-progress"),
-  // durations
+  // player durations
   currDuration: document.getElementById("current-duration"),
   totalDuration: document.getElementById("total-duration"),
   // playlist
   playlist: document.getElementById("playlist"),
   // current song
-  currSong: document.getElementById("song"),
+  currSong: document.getElementById("current-song"),
 };
 
 // references to the children of durations
