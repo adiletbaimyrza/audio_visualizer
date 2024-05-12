@@ -1,10 +1,16 @@
-/* ----- CSS Reset ----- */
+/* ----- CSS RESET ----- */
 button {
   background: unset;
   border: unset;
 }
-/* ----- CSS Reset ----- */
 
+* {
+  margin: unset;
+  padding: unset;
+  box-sizing: border-box;
+}
+
+/* ----- COLOR VARIABLES ---- */
 :root {
   --black: #191414;
   --lighter-black: #2a2424;
@@ -12,22 +18,19 @@ button {
   --grey: #808080;
 }
 
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
-
+/* ----- GLOBAL FONTS ----- */
 html {
   font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
 }
 
+/* ----- SET HEIGHT TO 100% ----- */
 html,
 body {
   height: 100%;
   width: 100%;
 }
 
+/* ----- PLAYER ----- */
 .player {
   position: absolute;
   bottom: 0;
@@ -38,7 +41,7 @@ body {
   width: 100%;
   padding: 20px 50px;
 
-  #song {
+  #current-song {
     grid-column: span 3;
     display: flex;
     align-items: center;
@@ -149,14 +152,51 @@ body {
   }
 }
 
+/* ----- PLAYLIST ----- */
 .playlist {
   position: absolute;
-  border-radius: 10px;
   left: 10px;
   bottom: 140px;
   display: flex;
   flex-direction: column;
+  border-radius: 10px;
   background-color: var(--black);
+  border-collapse: collapse;
+
+  thead {
+    padding: 20px 50px;
+
+    th {
+      color: var(--grey);
+      text-align: left;
+      padding: 10px 0;
+      border-bottom: 1px solid var(--grey);
+    }
+  }
+
+  .util-btn-cell {
+    width: 200px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    .playlist-play-btn,
+    .playlist-pause-btn {
+      display: none;
+    }
+  }
+
+  .poster-cell {
+    width: 100px;
+  }
+
+  .title-cell {
+    width: 300px;
+  }
+
+  .duration-cell {
+    width: 50px;
+  }
 
   .playlist__song {
     display: flex;
@@ -166,8 +206,6 @@ body {
     padding: 20px 50px;
 
     .now-playing {
-      position: relative;
-      right: 15px;
       display: none;
       justify-content: space-between;
       width: 20px;

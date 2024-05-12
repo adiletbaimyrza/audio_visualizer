@@ -91,6 +91,10 @@ const state = {
   setNowPlaying: (newVal) => {
     state.nowPlaying = newVal;
   },
+  currSong: null,
+  setCurrSong: (newVal) => {
+    state.setCurrSong = newVal;
+  },
 };
 
 // ----- INITIALIZE AUDIO CONTEXT, ANALYSER, AND DATA_ARRAY ----- //
@@ -101,28 +105,58 @@ analyser.fftSize = cnst.FFT_SIZE;
 const dataArray = new Uint8Array(analyser.frequencyBinCount);
 
 const populatePlaylist = () => {
-  let songsHtml = "";
+  playlistInnerHtml = "";
+
+  const thead = `
+    <thead>
+      <tr>
+        <th class="util-btn-cell">#<th>
+        <th class="poster-cell">Title<th>
+        <th class="title-cell"><th>
+        <th class="duration-cell">Duration<th>
+      </tr>
+    </thead>
+  `;
+
+  let tbody = "<tbody>";
 
   songs.forEach((song) => {
-    songsHtml += `
-    <button id="${song.slug}" class="playlist__song">
-      <div id="${song.slug}-now-playing" class="now-playing">
-        <span></span>
-        <span></span>
-        <span></span>
-      </div>
-      <img src="/posters/${song.slug}.jpg" alt="${song.name} by ${song.artist}" />
-      <div class="song-title">
+    tbody += `
+    <tr id="${song.slug}-playlist-song" class="playlist__song">
+      <td class="util-btn-cell">
+        <p>${songs.indexOf(song) + 1}</p>
+        <img class="playlist-play-btn" src="/svg/play.svg" alt="play icon" />
+        <img class="playlist-pause-btn" src="/svg/pause.svg" alt="pause icon" />
+        <div class="now-playing">
+          <span></span>
+          <span></span>
+          <span></span>
+        </div>
+      </td>
+
+      <td class="poster-cell">
+        <img src="/posters/${song.slug}.jpg" alt="${song.name} by ${song.artist}" />
+      </td>
+
+      <td class="title-cell">
         <h3>${song.name}</h3>
         <p>${song.artist}</p>
-      </div>
-      <p class="song-duration">${song.duration}</p>
-    </button>
+      </td>
+
+      <td class="duration-cell">
+        <p>${song.duration}</p>
+      </td>
+    </tr>
     `;
   });
 
-  ui.playlist.innerHTML = songsHtml;
+  tbody += "</tbody";
+
+  playlistInnerHtml = thead + tbody;
+
+  ui.playlist.innerHTML = playlistInnerHtml;
 };
+
 // ----- POPULATE PLAYLIST TABLE ----- //
 populatePlaylist();
 
@@ -327,7 +361,7 @@ const initializeApp = () => {
 };
 
 songs.forEach((song) => {
-  document.getElementById(song.slug).addEventListener("click", () => {
+  document.getElementById(`${song.slug}-playlist-song`).addEventListener("click", () => {
     ui.audio.src = `/audio/${song.slug}.mp3`;
 
     ui.currSong.poster.src = `/posters/${song.slug}.jpg`;
@@ -346,7 +380,33 @@ songs.forEach((song) => {
     analyser.connect(audioCtx.destination);
     ui.audio.play();
 
-    toggleNowPlaying(document.getElementById(`${song.slug}-now-playing`));
+    toggleNowPlaying(document.getElementById(`${song.slug}-playlist-song`).querySelector(".now-playing"));
+    if (state.currSong != null) {
+      state.currSong.querySelector("p").style.display = "block";
+    }
+    document.getElementById(`${song.slug}-playlist-song`).querySelector("p").style.display = "none";
+    state.currSong = document.getElementById(`${song.slug}-playlist-song`);
+  });
+
+  document.getElementById(`${song.slug}-playlist-song`).addEventListener("mouseover", () => {
+    if (state.isPlaying) {
+      document.getElementById(`${song.slug}-playlist-song`).querySelector(".now-playing").style.display = "none";
+      document.getElementById(`${song.slug}-playlist-song`).querySelector(".playlist-pause-btn").style.display =
+        "block";
+    } else {
+      document.getElementById(`${song.slug}-playlist-song`).querySelector(".p").style.display = "none";
+      document.getElementById(`${song.slug}-playlist-song`).querySelector(".playlist-play-btn").style.display = "block";
+    }
+  });
+
+  document.getElementById(`${song.slug}-playlist-song`).addEventListener("mouseout", () => {
+    if (state.isPlaying) {
+      document.getElementById(`${song.slug}-playlist-song`).querySelector(".now-playing").style.display = "block";
+      document.getElementById(`${song.slug}-playlist-song`).querySelector(".playlist-pause-btn").style.display = "none";
+    } else {
+      document.getElementById(`${song.slug}-playlist-song`).querySelector(".p").style.display = "block";
+      document.getElementById(`${song.slug}-playlist-song`).querySelector(".playlist-play-btn").style.display = "none";
+    }
   });
 });
 
