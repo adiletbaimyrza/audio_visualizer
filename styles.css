@@ -12,10 +12,11 @@ button {
 
 /* ----- COLOR VARIABLES ---- */
 :root {
-  --black: #191414;
-  --lighter-black: #2a2424;
+  --black: #1f1829;
+  --lighter-black: #2e243d;
   --white: #ffffff;
   --grey: #808080;
+  --yellow: #e8d940;
 }
 
 /* ----- GLOBAL FONTS ----- */
@@ -154,6 +155,7 @@ body {
 
 /* ----- PLAYLIST ----- */
 .playlist {
+  font-size: 0.9rem;
   position: absolute;
   left: 10px;
   bottom: 140px;
@@ -164,71 +166,38 @@ body {
   border-collapse: collapse;
 
   thead {
-    padding: 20px 50px;
+    padding: 10px 30px;
 
     th {
       color: var(--grey);
       text-align: left;
       padding: 10px 0;
       border-bottom: 1px solid var(--grey);
+
+      img {
+        height: 0.9rem;
+      }
     }
   }
 
   .util-btn-cell {
-    width: 200px;
+    width: 50px;
     display: flex;
     align-items: center;
     justify-content: center;
+    color: var(--grey);
+    font-weight: bold;
 
     .playlist-play-btn,
     .playlist-pause-btn {
       display: none;
+      width: 20px;
+      height: 20px;
     }
   }
 
   .poster-cell {
-    width: 100px;
-  }
-
-  .title-cell {
-    width: 300px;
-  }
-
-  .duration-cell {
-    width: 50px;
-  }
-
-  .playlist__song {
-    display: flex;
-    align-items: center;
-    color: var(--white);
-    text-align: left;
-    padding: 20px 50px;
-
-    .now-playing {
-      display: none;
-      justify-content: space-between;
-      width: 20px;
-      height: 20px;
-
-      span {
-        width: 4px;
-        height: 100%;
-        background-color: rgb(17, 212, 115);
-        border-radius: 3px;
-        transform-origin: bottom;
-        animation: bounce 2.2s ease infinite alternate;
-        content: "";
-
-        &:nth-of-type(2) {
-          animation-delay: -2.2s; /* Start at the end of animation */
-        }
-
-        &:nth-of-type(3) {
-          animation-delay: -3.7s; /* Start mid-way of return of animation */
-        }
-      }
-    }
+    width: 60px;
 
     img {
       height: 40px;
@@ -236,34 +205,62 @@ body {
       border-radius: 5px;
       margin-right: 10px;
     }
+  }
 
-    .song-title {
-      width: 200px;
-
-      p {
-        margin-top: 5px;
-        color: var(--grey);
-        font-weight: bold;
-      }
-    }
-
-    .song-duration {
+  .title-cell {
+    width: 300px;
+    p {
       color: var(--grey);
       font-weight: bold;
     }
   }
 
-  .playlist__song:first-child {
-    border-top-right-radius: 10px;
-    border-top-left-radius: 10px;
+  .duration-cell {
+    width: 80px;
+    text-align: center;
+    color: var(--grey);
+    font-weight: bold;
   }
 
-  .playlist__song:last-child {
+  .playlist-song {
+    display: flex;
+    align-items: center;
+    color: var(--white);
+    text-align: left;
+    padding: 20px 30px;
+
+    .now-playing {
+      display: none;
+      justify-content: space-between;
+      width: 15px;
+      height: 15px;
+
+      span {
+        width: 3px;
+        height: 100%;
+        background-color: var(--yellow);
+        border-radius: 3px;
+        transform-origin: bottom;
+        animation: bounce 2.2s ease infinite alternate;
+        content: "";
+
+        &:nth-of-type(2) {
+          animation-delay: -2.2s;
+        }
+
+        &:nth-of-type(3) {
+          animation-delay: -3.7s;
+        }
+      }
+    }
+  }
+
+  .playlist-song:last-child {
     border-bottom-right-radius: 10px;
     border-bottom-left-radius: 10px;
   }
 
-  .playlist__song:hover {
+  .playlist-song:hover {
     background-color: var(--lighter-black);
   }
 }
