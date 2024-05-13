@@ -43,6 +43,7 @@ const ui = {
   forwardBtn: document.getElementById("forward-btn"),
   backwardBtn: document.getElementById("backward-btn"),
   volumeHighBtn: document.getElementById("volume-high-btn"),
+  makeBigBtn: document.getElementById("make-big-btn"),
   mutedBtn: document.getElementById("muted-btn"),
   // player progress bars
   songProgress: document.getElementById("controls-progress"),
@@ -112,10 +113,10 @@ const populatePlaylist = () => {
   const thead = `
     <thead>
       <tr>
-        <th class="util-btn-cell">#<th>
-        <th class="poster-cell">Title<th>
-        <th class="title-cell"><th>
-        <th class="duration-cell"><img src="/svg/clock.svg" alt="clock icon"/><th>
+        <th class="util-btn-cell">#</th>
+        <th class="poster-cell">Title</th>
+        <th class="title-cell"></th>
+        <th title="Duration" class="duration-cell"><img src="/svg/clock.svg" alt="clock icon"/></th>
       </tr>
     </thead>
   `;
@@ -152,15 +153,34 @@ const populatePlaylist = () => {
     `;
   });
 
-  tbody += "</tbody";
+  tbody += "</tbody>";
 
-  playlistInnerHtml = thead + tbody;
+  const makeSmallBtn = `
+    <button id="make-small-btn" type="button" title="Hide playlist">
+      <img src="/svg/make-small.svg" alt="make small icon" />
+    </button>
+  `;
+
+  playlistInnerHtml = thead + tbody + makeSmallBtn;
 
   ui.playlist.innerHTML = playlistInnerHtml;
 };
 
 // ----- POPULATE PLAYLIST TABLE ----- //
 populatePlaylist();
+ui.makeSmallBtn = document.getElementById("make-small-btn");
+
+ui.makeSmallBtn.addEventListener("click", () => {
+  ui.playlist.style.animation = "getSmall 0.3s cubic-bezier(0.075, 0.82, 0.165, 1) forwards";
+  ui.playlist.style.transformOrigin = "1% 98%";
+  ui.makeBigBtn.style.display = "block";
+});
+
+ui.makeBigBtn.addEventListener("click", () => {
+  ui.playlist.style.animation = "getBig 0.3s cubic-bezier(0.075, 0.82, 0.165, 1) forwards";
+  ui.playlist.style.transformOrigin = "0% 100%";
+  ui.makeBigBtn.style.display = "none";
+});
 
 /* ----- EVENT HANDLERS ----- */
 
@@ -185,9 +205,15 @@ ui.audio.addEventListener("ended", () => {
   ui.audio.currentTime = 0;
 
   togglePlaybackBtn();
+
+  document.getElementById(`${state.currSong.path}-playlist-song`).querySelector(".now-playing").style.display = "none";
+  document.getElementById(`${state.currSong.path}-playlist-song`).querySelector(".playlist-pause-btn").style.display =
+    "none";
+  document.getElementById(`${state.currSong.path}-playlist-song`).querySelector("p").style.display = "block";
 });
 
 // button event handlers
+
 ui.playBtn.addEventListener("click", () => {
   state.setIsPlaying(true);
 
@@ -206,6 +232,10 @@ ui.playBtn.addEventListener("click", () => {
     "none";
   document.getElementById(`${state.currSong.path}-playlist-song`).querySelector("p").style.display = "none";
   document.getElementById(`${state.currSong.path}-playlist-song`).querySelector(".now-playing").style.display = "flex";
+
+  document.getElementById(`${state.currSong.path}-playlist-song`).querySelector(".util-btn-cell").style.color =
+    "var(--yellow)";
+  document.getElementById(`${state.currSong.path}-playlist-song`).querySelector("h3").style.color = "var(--yellow)";
 });
 
 ui.pauseBtn.addEventListener("click", () => {
