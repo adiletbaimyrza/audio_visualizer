@@ -40,7 +40,7 @@ body {
   background-color: var(--black);
   color: var(--white);
   width: 100%;
-  padding: 20px 50px;
+  padding: 12px;
 
   #current-song {
     grid-column: span 3;
@@ -84,21 +84,17 @@ body {
       .controls-btn:active {
         opacity: 0.5;
       }
+      #pause-btn,
       #play-btn {
-        scale: 1.2;
-        margin: 0 40px 20px 40px;
+        margin: 0 30px 10px 30px;
       }
-      #pause-btn {
-        scale: 1.2;
-        margin: 0 40px 20px 40px;
-      }
+
+      #backward-btn,
       #forward-btn {
-        scale: 0.7;
-        margin-bottom: 20px;
-      }
-      #backward-btn {
-        scale: 0.7;
-        margin-bottom: 20px;
+        margin-bottom: 10px;
+        img {
+          height: 20px;
+        }
       }
     }
 
@@ -126,24 +122,21 @@ body {
 
     #volume-high-btn {
       display: flex;
-      width: 50px;
+      width: 40px;
 
       img {
-        margin-left: 1.8px;
-        width: 40px;
-        height: 40px;
-        scale: 0.7;
+        width: 25px;
+        height: 25px;
       }
     }
 
     #muted-btn {
       display: flex;
-      width: 50px;
+      width: 40px;
 
       img {
-        width: 40px;
-        height: 40px;
-        scale: 0.63;
+        width: 23px;
+        height: 23px;
       }
     }
 
@@ -158,15 +151,16 @@ body {
   font-size: 0.9rem;
   position: absolute;
   left: 10px;
-  bottom: 140px;
+  bottom: 120px;
   display: flex;
   flex-direction: column;
   border-radius: 10px;
   background-color: var(--black);
   border-collapse: collapse;
+  transform-origin: 0% 100%;
 
   thead {
-    padding: 10px 30px;
+    padding: 15px 20px 10px 20px;
 
     th {
       color: var(--grey);
@@ -182,9 +176,7 @@ body {
 
   .util-btn-cell {
     width: 50px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    text-align: center;
     color: var(--grey);
     font-weight: bold;
 
@@ -193,6 +185,11 @@ body {
       display: none;
       width: 20px;
       height: 20px;
+      margin: 0 auto;
+    }
+
+    .now-playing {
+      margin: 0 auto;
     }
   }
 
@@ -208,7 +205,7 @@ body {
   }
 
   .title-cell {
-    width: 300px;
+    width: 250px;
     p {
       color: var(--grey);
       font-weight: bold;
@@ -227,7 +224,7 @@ body {
     align-items: center;
     color: var(--white);
     text-align: left;
-    padding: 20px 30px;
+    padding: 15px 20px;
 
     .now-playing {
       display: none;
@@ -262,6 +259,49 @@ body {
 
   .playlist-song:hover {
     background-color: var(--lighter-black);
+  }
+
+  #make-small-btn {
+    position: absolute;
+
+    right: 10px;
+    top: 10px;
+    display: none;
+    cursor: pointer;
+    opacity: 0.5;
+    img {
+      width: 15px;
+      height: 15px;
+    }
+  }
+
+  #make-small-btn:hover {
+    opacity: 1;
+  }
+}
+
+.playlist:hover #make-small-btn {
+  display: block;
+}
+
+#make-big-btn {
+  position: absolute;
+  display: none;
+  background-color: var(--black);
+  padding: 8px 10px 7px 10px;
+  border-radius: 5px;
+  left: 10px;
+  bottom: 120px;
+  cursor: pointer;
+
+  img {
+    width: 16px;
+    height: 16px;
+    opacity: 0.5;
+  }
+
+  img:hover {
+    opacity: 1;
   }
 }
 
@@ -375,5 +415,23 @@ body {
 
   100% {
     transform: scaleY(0.6);
+  }
+}
+
+@keyframes getSmall {
+  from {
+    transform: scale(1);
+  }
+  to {
+    transform: scale(0);
+  }
+}
+
+@keyframes getBig {
+  from {
+    transform: scale(0);
+  }
+  to {
+    transform: scale(1);
   }
 }
