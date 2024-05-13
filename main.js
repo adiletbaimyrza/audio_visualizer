@@ -10,25 +10,25 @@ const songs = [
   {
     name: "Rolling in the Deep",
     artist: "Adele",
-    slug: "adele",
+    path: "adele",
     duration: "3:53",
   },
   {
     name: "Oбійми",
     artist: "Oкеан Eльзи",
-    slug: "okean-elzy",
+    path: "okean-elzy",
     duration: "3:44",
   },
   {
     name: "Алдадын",
     artist: "Мирбек Атабеков",
-    slug: "mirbek",
+    path: "mirbek",
     duration: "3:36",
   },
   {
     name: "Кукла колдуна",
     artist: "Король и Шут ",
-    slug: "korol-i-shut",
+    path: "korol-i-shut",
     duration: "3:22",
   },
 ];
@@ -91,14 +91,16 @@ const state = {
   setNowPlaying: (newVal) => {
     state.nowPlaying = newVal;
   },
-  currSong: null,
+  currSong: songs[0],
   setCurrSong: (newVal) => {
     state.setCurrSong = newVal;
   },
 };
 
 // ----- INITIALIZE AUDIO CONTEXT, ANALYSER, AND DATA_ARRAY ----- //
+
 const audioCtx = new window.AudioContext();
+
 const audioSource = audioCtx.createMediaElementSource(ui.audio);
 const analyser = audioCtx.createAnalyser();
 analyser.fftSize = cnst.FFT_SIZE;
@@ -122,7 +124,7 @@ const populatePlaylist = () => {
 
   songs.forEach((song) => {
     tbody += `
-    <tr id="${song.slug}-playlist-song" class="playlist__song">
+    <tr id="${song.path}-playlist-song" class="playlist__song">
       <td class="util-btn-cell">
         <p>${songs.indexOf(song) + 1}</p>
         <img class="playlist-play-btn" src="/svg/play.svg" alt="play icon" />
@@ -135,7 +137,7 @@ const populatePlaylist = () => {
       </td>
 
       <td class="poster-cell">
-        <img src="/posters/${song.slug}.jpg" alt="${song.name} by ${song.artist}" />
+        <img src="/posters/${song.path}.jpg" alt="${song.name} by ${song.artist}" />
       </td>
 
       <td class="title-cell">
@@ -160,8 +162,11 @@ const populatePlaylist = () => {
 // ----- POPULATE PLAYLIST TABLE ----- //
 populatePlaylist();
 
-// ----- EVENT HANDLERS ----- //
-// audio event handlers
+/* ----- EVENT HANDLERS ----- */
+
+/* ----- audio ----- */
+
+/* while the audio is playing, it should be updating the scene where the audio is visualized. TODO: construct a scene changing logic */
 ui.audio.addEventListener("play", () => {
   updateGrids();
 });
@@ -173,7 +178,7 @@ ui.audio.addEventListener("timeupdate", () => {
 });
 
 ui.audio.addEventListener("ended", () => {
-  state.isPlaying = false;
+  state.setIsPlaying(false);
 
   updateProgress(ui.songProgress, 0);
 
@@ -188,14 +193,19 @@ ui.playBtn.addEventListener("click", () => {
 
   togglePlaybackBtn();
 
-  if (audioCtx.state === "suspended") {
-    audioCtx.resume();
-  }
+  if (audioCtx.state === "suspended") audioCtx.resume();
 
   audioSource.connect(analyser);
   analyser.connect(audioCtx.destination);
 
   ui.audio.play();
+
+  document.getElementById(`${state.currSong.path}-playlist-song`).querySelector(".playlist-play-btn").style.display =
+    "none";
+  document.getElementById(`${state.currSong.path}-playlist-song`).querySelector(".playlist-pause-btn").style.display =
+    "none";
+  document.getElementById(`${state.currSong.path}-playlist-song`).querySelector("p").style.display = "none";
+  document.getElementById(`${state.currSong.path}-playlist-song`).querySelector(".now-playing").style.display = "flex";
 });
 
 ui.pauseBtn.addEventListener("click", () => {
@@ -204,6 +214,9 @@ ui.pauseBtn.addEventListener("click", () => {
   togglePlaybackBtn();
 
   ui.audio.pause();
+
+  document.getElementById(`${state.currSong.path}-playlist-song`).querySelector(".now-playing").style.display = "none";
+  document.getElementById(`${state.currSong.path}-playlist-song`).querySelector("p").style.display = "block";
 });
 
 ui.forwardBtn.addEventListener("click", () => {
@@ -360,58 +373,78 @@ const initializeApp = () => {
   initializeCurrSongData();
 };
 
+/* ------ SONG ELEMENTS IN THE PLAYLIST ------ */
 songs.forEach((song) => {
-  document.getElementById(`${song.slug}-playlist-song`).addEventListener("click", () => {
-    ui.audio.src = `/audio/${song.slug}.mp3`;
+  document.getElementById(`${song.path}-playlist-song`).addEventListener("click", () => {
+    songs.forEach((song) => {
+      document.getElementById(`${song.path}-playlist-song`).style.color = "white";
+    });
+    document.getElementById(`${song.path}-playlist-song`).style.color = "yellow";
 
-    ui.currSong.poster.src = `/posters/${song.slug}.jpg`;
-    ui.currSong.poster.alt = `${song.name} by ${song.artist}`;
-    ui.currSong.name.textContent = `${song.name}`;
-    ui.currSong.artist.textContent = song.artist;
+    if (state.isPlaying && state.currSong === song) {
+      state.setIsPlaying(false);
 
-    if (audioCtx.state === "suspended") {
-      audioCtx.resume();
+      togglePlaybackBtn();
+
+      ui.audio.pause();
+
+      document.getElementById(`${song.path}-playlist-song`).querySelector(".now-playing").style.display = "none";
+      document.getElementById(`${song.path}-playlist-song`).querySelector("p").style.display = "block";
+    } else {
+      ui.audio.src = `/audio/${song.path}.mp3`;
+
+      if (audioCtx.state === "suspended") audioCtx.resume();
+
+      audioSource.connect(analyser);
+      analyser.connect(audioCtx.destination);
+
+      ui.audio.play();
+
+      ui.currSong.poster.src = `/posters/${song.path}.jpg`;
+      ui.currSong.poster.alt = `${song.name} by ${song.artist}`;
+      ui.currSong.name.textContent = song.name;
+      ui.currSong.artist.textContent = song.artist;
+
+      state.currSong = song;
+
+      state.setIsPlaying(true);
+      togglePlaybackBtn();
+
+      songs.forEach((song) => {
+        document.getElementById(`${song.path}-playlist-song`).querySelector(".now-playing").style.display = "none";
+        document.getElementById(`${song.path}-playlist-song`).querySelector("p").style.display = "block";
+      });
+      document.getElementById(`${song.path}-playlist-song`).querySelector(".playlist-play-btn").style.display = "none";
+      document.getElementById(`${song.path}-playlist-song`).querySelector(".playlist-pause-btn").style.display = "none";
+      document.getElementById(`${song.path}-playlist-song`).querySelector("p").style.display = "none";
+      document.getElementById(`${song.path}-playlist-song`).querySelector(".now-playing").style.display = "flex";
     }
-
-    state.setIsPlaying(true);
-    togglePlaybackBtn();
-
-    audioSource.connect(analyser);
-    analyser.connect(audioCtx.destination);
-    ui.audio.play();
-
-    toggleNowPlaying(document.getElementById(`${song.slug}-playlist-song`).querySelector(".now-playing"));
-    if (state.currSong != null) {
-      state.currSong.querySelector("p").style.display = "block";
-    }
-    document.getElementById(`${song.slug}-playlist-song`).querySelector("p").style.display = "none";
-    state.currSong = document.getElementById(`${song.slug}-playlist-song`);
   });
 
-  document.getElementById(`${song.slug}-playlist-song`).addEventListener("mouseover", () => {
-    if (state.isPlaying) {
-      document.getElementById(`${song.slug}-playlist-song`).querySelector(".now-playing").style.display = "none";
-      document.getElementById(`${song.slug}-playlist-song`).querySelector(".playlist-pause-btn").style.display =
+  document.getElementById(`${song.path}-playlist-song`).addEventListener("mouseover", () => {
+    if (state.isPlaying && state.currSong === song) {
+      document.getElementById(`${song.path}-playlist-song`).querySelector(".now-playing").style.display = "none";
+      document.getElementById(`${song.path}-playlist-song`).querySelector(".playlist-pause-btn").style.display =
         "block";
     } else {
-      document.getElementById(`${song.slug}-playlist-song`).querySelector(".p").style.display = "none";
-      document.getElementById(`${song.slug}-playlist-song`).querySelector(".playlist-play-btn").style.display = "block";
+      document.getElementById(`${song.path}-playlist-song`).querySelector("p").style.display = "none";
+      document.getElementById(`${song.path}-playlist-song`).querySelector(".playlist-play-btn").style.display = "block";
     }
   });
 
-  document.getElementById(`${song.slug}-playlist-song`).addEventListener("mouseout", () => {
-    if (state.isPlaying) {
-      document.getElementById(`${song.slug}-playlist-song`).querySelector(".now-playing").style.display = "block";
-      document.getElementById(`${song.slug}-playlist-song`).querySelector(".playlist-pause-btn").style.display = "none";
+  document.getElementById(`${song.path}-playlist-song`).addEventListener("mouseout", () => {
+    if (state.isPlaying && state.currSong === song) {
+      document.getElementById(`${song.path}-playlist-song`).querySelector(".now-playing").style.display = "flex";
+      document.getElementById(`${song.path}-playlist-song`).querySelector(".playlist-pause-btn").style.display = "none";
     } else {
-      document.getElementById(`${song.slug}-playlist-song`).querySelector(".p").style.display = "block";
-      document.getElementById(`${song.slug}-playlist-song`).querySelector(".playlist-play-btn").style.display = "none";
+      document.getElementById(`${song.path}-playlist-song`).querySelector("p").style.display = "block";
+      document.getElementById(`${song.path}-playlist-song`).querySelector(".playlist-play-btn").style.display = "none";
     }
   });
 });
 
 const initializeCurrSongData = () => {
-  ui.currSong.poster.src = `/posters/${songs[0].slug}.jpg`;
+  ui.currSong.poster.src = `/posters/${songs[0].path}.jpg`;
   ui.currSong.poster.alt = `${songs[0].name} by ${songs[0].artist}`;
   ui.currSong.name.textContent = `${songs[0].name}`;
   ui.currSong.artist.textContent = songs[0].artist;
