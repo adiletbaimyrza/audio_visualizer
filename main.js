@@ -115,7 +115,7 @@ const populatePlaylist = () => {
         <th class="util-btn-cell">#<th>
         <th class="poster-cell">Title<th>
         <th class="title-cell"><th>
-        <th class="duration-cell">Duration<th>
+        <th class="duration-cell"><img src="/svg/clock.svg" alt="clock icon"/><th>
       </tr>
     </thead>
   `;
@@ -124,7 +124,7 @@ const populatePlaylist = () => {
 
   songs.forEach((song) => {
     tbody += `
-    <tr id="${song.path}-playlist-song" class="playlist__song">
+    <tr id="${song.path}-playlist-song" class="playlist-song">
       <td class="util-btn-cell">
         <p>${songs.indexOf(song) + 1}</p>
         <img class="playlist-play-btn" src="/svg/play.svg" alt="play icon" />
@@ -377,9 +377,11 @@ const initializeApp = () => {
 songs.forEach((song) => {
   document.getElementById(`${song.path}-playlist-song`).addEventListener("click", () => {
     songs.forEach((song) => {
-      document.getElementById(`${song.path}-playlist-song`).style.color = "white";
+      document.getElementById(`${song.path}-playlist-song`).querySelector(".util-btn-cell").style.color = "var(--grey)";
+      document.getElementById(`${song.path}-playlist-song`).querySelector("h3").style.color = "var(--white)";
     });
-    document.getElementById(`${song.path}-playlist-song`).style.color = "yellow";
+    document.getElementById(`${song.path}-playlist-song`).querySelector(".util-btn-cell").style.color = "var(--yellow)";
+    document.getElementById(`${song.path}-playlist-song`).querySelector("h3").style.color = "var(--yellow)";
 
     if (state.isPlaying && state.currSong === song) {
       state.setIsPlaying(false);
@@ -389,6 +391,7 @@ songs.forEach((song) => {
       ui.audio.pause();
 
       document.getElementById(`${song.path}-playlist-song`).querySelector(".now-playing").style.display = "none";
+      document.getElementById(`${song.path}-playlist-song`).querySelector(".playlist-pause-btn").style.display = "none";
       document.getElementById(`${song.path}-playlist-song`).querySelector("p").style.display = "block";
     } else {
       ui.audio.src = `/audio/${song.path}.mp3`;
@@ -414,6 +417,7 @@ songs.forEach((song) => {
         document.getElementById(`${song.path}-playlist-song`).querySelector(".now-playing").style.display = "none";
         document.getElementById(`${song.path}-playlist-song`).querySelector("p").style.display = "block";
       });
+
       document.getElementById(`${song.path}-playlist-song`).querySelector(".playlist-play-btn").style.display = "none";
       document.getElementById(`${song.path}-playlist-song`).querySelector(".playlist-pause-btn").style.display = "none";
       document.getElementById(`${song.path}-playlist-song`).querySelector("p").style.display = "none";
