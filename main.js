@@ -394,17 +394,17 @@ songs.forEach((song) => {
       document.getElementById(`${song.slug}-playlist-song`).querySelector(".playlist-pause-btn").style.display =
         "block";
     } else {
-      document.getElementById(`${song.slug}-playlist-song`).querySelector(".p").style.display = "none";
+      document.getElementById(`${song.slug}-playlist-song`).querySelector("p").style.display = "none";
       document.getElementById(`${song.slug}-playlist-song`).querySelector(".playlist-play-btn").style.display = "block";
     }
   });
 
-  document.getElementById(`${song.slug}-playlist-song`).addEventListener("mouseout", () => {
+  document.getElementById(`${song.slug}-playlist-song`).addEventListener("mouseleave", () => {
     if (state.isPlaying) {
       document.getElementById(`${song.slug}-playlist-song`).querySelector(".now-playing").style.display = "block";
       document.getElementById(`${song.slug}-playlist-song`).querySelector(".playlist-pause-btn").style.display = "none";
     } else {
-      document.getElementById(`${song.slug}-playlist-song`).querySelector(".p").style.display = "block";
+      document.getElementById(`${song.slug}-playlist-song`).querySelector("p").style.display = "block";
       document.getElementById(`${song.slug}-playlist-song`).querySelector(".playlist-play-btn").style.display = "none";
     }
   });
