@@ -29,6 +29,7 @@ html,
 body {
   height: 100%;
   width: 100%;
+  overflow: hidden;
 }
 
 /* ----- PLAYER ----- */
@@ -144,6 +145,11 @@ body {
       max-width: 150px;
     }
   }
+
+  #hide-btn {
+    position: absolute;
+    right: 0;
+  }
 }
 
 /* ----- PLAYLIST ----- */
@@ -157,7 +163,7 @@ body {
   border-radius: 10px;
   background-color: var(--black);
   border-collapse: collapse;
-  transform-origin: 0% 100%;
+  transform-origin: 1% 98%;
 
   thead {
     padding: 15px 20px 10px 20px;
@@ -282,6 +288,10 @@ body {
 
 .playlist:hover #make-small-btn {
   display: block;
+}
+
+#show-btn {
+  position: absolute;
 }
 
 #make-big-btn {
@@ -433,5 +443,41 @@ body {
   }
   to {
     transform: scale(1);
+  }
+}
+
+@keyframes hide {
+  from {
+    transform: translateY(0);
+  }
+  to {
+    transform: translateY(100%);
+  }
+}
+
+@keyframes show {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideDown {
+  from {
+    transform: translateY(0);
+  }
+  to {
+    transform: translateY(104px);
+  }
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(104px);
+  }
+  to {
+    transform: translateY(0);
   }
 }
