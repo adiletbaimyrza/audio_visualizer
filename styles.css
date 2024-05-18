@@ -147,8 +147,21 @@ body {
   }
 
   #hide-btn {
+    border-radius: 2px;
+    font-size: 10px;
+    color: var(--white);
     position: absolute;
-    right: 0;
+    top: 10px;
+    right: 10px;
+    display: flex;
+    align-items: center;
+    padding: 5px;
+    background-color: var(--lighter-black);
+
+    img {
+      width: 10px;
+      height: 10px;
+    }
   }
 }
 
@@ -291,7 +304,13 @@ body {
 }
 
 #show-btn {
+  display: none;
   position: absolute;
+  border-radius: 2px;
+  font-size: 10px;
+  color: var(--white);
+  padding: 5px;
+  background-color: var(--lighter-black);
 }
 
 #make-big-btn {
