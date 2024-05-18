@@ -582,7 +582,7 @@ songs.forEach((song) => {
           .getElementById(`${song.path}-playlist-song`)
           .querySelector("p").style.display = "block";
       } else {
-        ui.audio.src = `audio_visualizer/audio/${song.path}.mp3`;
+        ui.audio.src = `/audio/${song.path}.mp3`;
 
         if (audioCtx.state === "suspended") audioCtx.resume();
 
