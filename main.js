@@ -582,7 +582,7 @@ songs.forEach((song) => {
           .getElementById(`${song.path}-playlist-song`)
           .querySelector("p").style.display = "block";
       } else {
-        ui.audio.src = `audio_visualizer/audio/${song.path}.mp3`;
+        ui.audio.src = `/audio_visualizer/audio/${song.path}.mp3`;
 
         if (audioCtx.state === "suspended") audioCtx.resume();
 
@@ -591,7 +591,7 @@ songs.forEach((song) => {
 
         ui.audio.play();
 
-        ui.currSong.poster.src = `audio_visualizer/posters/${song.path}.jpg`;
+        ui.currSong.poster.src = `/audio_visualizer/posters/${song.path}.jpg`;
         ui.currSong.poster.alt = `${song.name} by ${song.artist}`;
         ui.currSong.name.textContent = song.name;
         ui.currSong.artist.textContent = song.artist;
@@ -667,7 +667,7 @@ songs.forEach((song) => {
 });
 
 const initializeCurrSongData = () => {
-  ui.currSong.poster.src = `audio_visualizer/posters/${songs[0].path}.jpg`;
+  ui.currSong.poster.src = `/audio_visualizer/posters/${songs[0].path}.jpg`;
   ui.currSong.poster.alt = `${songs[0].name} by ${songs[0].artist}`;
   ui.currSong.name.textContent = `${songs[0].name}`;
   ui.currSong.artist.textContent = songs[0].artist;
