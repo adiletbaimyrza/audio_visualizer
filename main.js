@@ -128,7 +128,7 @@ const populatePlaylist = () => {
         <th class="util-btn-cell">#</th>
         <th class="poster-cell">Title</th>
         <th class="title-cell"></th>
-        <th title="Duration" class="duration-cell"><img src="/svg/clock.svg" alt="clock icon"/></th>
+        <th title="Duration" class="duration-cell"><img src="/audio_visualizer/svg/clock.svg" alt="clock icon"/></th>
       </tr>
     </thead>
   `;
@@ -140,8 +140,8 @@ const populatePlaylist = () => {
     <tr id="${song.path}-playlist-song" class="playlist-song">
       <td class="util-btn-cell">
         <p>${songs.indexOf(song) + 1}</p>
-        <img class="playlist-play-btn" src="/svg/play.svg" alt="play icon" />
-        <img class="playlist-pause-btn" src="/svg/pause.svg" alt="pause icon" />
+        <img class="playlist-play-btn" src="/audio_visualizer/svg/play.svg" alt="play icon" />
+        <img class="playlist-pause-btn" src="/audio_visualizer/svg/pause.svg" alt="pause icon" />
         <div class="now-playing">
           <span></span>
           <span></span>
@@ -150,9 +150,9 @@ const populatePlaylist = () => {
       </td>
 
       <td class="poster-cell">
-        <img src="/posters/${song.path}.jpg" alt="${song.name} by ${
-      song.artist
-    }" />
+        <img src="audio_visualizer/posters/${song.path}.jpg" alt="${
+      song.name
+    } by ${song.artist}" />
       </td>
 
       <td class="title-cell">
@@ -171,7 +171,7 @@ const populatePlaylist = () => {
 
   const makeSmallBtn = `
     <button id="make-small-btn" type="button" title="Hide playlist">
-      <img src="/svg/make-small.svg" alt="make small icon" />
+      <img src="/audio_visualizer/svg/make-small.svg" alt="make small icon" />
     </button>
   `;
 
@@ -582,7 +582,7 @@ songs.forEach((song) => {
           .getElementById(`${song.path}-playlist-song`)
           .querySelector("p").style.display = "block";
       } else {
-        ui.audio.src = `/audio/${song.path}.mp3`;
+        ui.audio.src = `audio_visualizer/audio/${song.path}.mp3`;
 
         if (audioCtx.state === "suspended") audioCtx.resume();
 
