@@ -250,6 +250,8 @@ ui.makeBigBtn.addEventListener("click", () => {
 ui.hideBtn.addEventListener("click", () => {
   state.setIsPlayerHidden(true);
 
+  ui.showBtn.style.display = "block";
+
   ui.player.style.animation = "2s hide cubic-bezier(0.19, 1, 0.22, 1) forwards";
 
   if (state.isPlaylistHidden) {
@@ -263,6 +265,8 @@ ui.hideBtn.addEventListener("click", () => {
 
 ui.showBtn.addEventListener("click", () => {
   state.setIsPlayerHidden(false);
+
+  ui.showBtn.style.display = "none";
 
   ui.player.style.animation = "2s show cubic-bezier(0.19, 1, 0.22, 1) forwards";
 
