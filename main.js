@@ -1,7 +1,7 @@
 // ----- CONSTANTS ----- //
 const cnst = {
-  ROW_LEN: 64,
-  COL_LEN: 25,
+  ROW_LEN: 50,
+  COL_LEN: 50,
   FFT_SIZE: 128,
 };
 
@@ -59,6 +59,9 @@ const ui = {
   playlist: document.getElementById("playlist"),
   // current song
   currSong: document.getElementById("current-song"),
+
+  // scene
+  scene: document.getElementById("container"),
 };
 
 // references to the children of durations
@@ -107,6 +110,10 @@ const state = {
   isPlaylistHidden: false,
   setIsPlaylistHidden: (newVal) => {
     state.isPlaylistHidden = newVal;
+  },
+  visualization: "canvas",
+  setVisualization: (newVal) => {
+    state.visualization = newVal;
   },
 };
 
@@ -190,7 +197,11 @@ ui.makeSmallBtn = document.getElementById("make-small-btn");
 
 /* while the audio is playing, it should be updating the scene where the audio is visualized. TODO: construct a scene changing logic */
 ui.audio.addEventListener("play", () => {
-  updateGrids();
+  if (state.visualization === "grid") {
+    updateGrids();
+  } else {
+    updateCanvas();
+  }
 });
 
 ui.audio.addEventListener("timeupdate", () => {
@@ -458,7 +469,7 @@ const createGrids = () => {
 const getHslColor = (index, soundIntensity) => {
   const hue = (360 / 30) * index;
   const saturation = "100%";
-  const lightness = 50 + (soundIntensity / 30) * 50 + "%";
+  const lightness = 50 + (soundIntensity / 60) * 10 + "%";
   const color = `hsl(${hue}, ${saturation}, ${lightness})`;
   return color;
 };
@@ -531,8 +542,13 @@ const updateProgress = (progress, percent) => {
 
 // ----- APP INITIALIZATION FUNCTION ----- //
 const initializeApp = () => {
-  createGrids();
+  createScene(state.visualization);
 
+  if (state.visualization === "grid") {
+    createGrids();
+  } else if (state.visualization === "canvas") {
+    // createCanvas
+  }
   togglePlaybackBtn();
   toggleVolumeBtn();
 
@@ -671,6 +687,76 @@ const initializeCurrSongData = () => {
   ui.currSong.poster.alt = `${songs[0].name} by ${songs[0].artist}`;
   ui.currSong.name.textContent = `${songs[0].name}`;
   ui.currSong.artist.textContent = songs[0].artist;
+};
+
+const createScene = (sceneType) => {
+  switch (sceneType) {
+    case "grid":
+      ui.scene.innerHTML = `<div class="grid-container" id="left-grid-container"></div>
+      <div class="grid-container" id="right-grid-container"></div>
+      <div class="grid-container" id="bottom-left-grid-container"></div>
+      <div class="grid-container" id="bottom-right-grid-container"></div>`;
+      break;
+    case "canvas":
+      ui.scene.innerHTML = `<canvas width="100%" height="100%">`;
+      break;
+  }
+};
+
+const updateCanvas = () => {
+  const canvas = ui.scene.querySelector("canvas");
+  const ctx = canvas.getContext("2d");
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+  analyser.getByteFrequencyData(dataArray);
+  const width = canvas.width / 2;
+  const height = canvas.height / 2;
+
+  for (let j = 0; j < cnst.ROW_LEN; j++) {
+    const soundIntensity = Math.floor(dataArray[j] / 12);
+
+    for (let i = 0; i < cnst.COL_LEN; i++) {
+      const color = getHslColor(i, soundIntensity);
+      const pixelHeight = height / cnst.ROW_LEN;
+      const pixelWidth = width / cnst.COL_LEN;
+
+      ctx.fillStyle = i < soundIntensity ? color : "#000";
+
+      // Top-left quadrant
+      ctx.fillRect(
+        (cnst.COL_LEN - j) * pixelWidth,
+        (cnst.ROW_LEN - i) * pixelHeight,
+        pixelWidth,
+        pixelHeight
+      );
+
+      // Bottom-right quadrant
+      ctx.fillRect(
+        width + j * pixelWidth,
+        height + i * pixelHeight,
+        pixelWidth,
+        pixelHeight
+      );
+
+      // Top-right quadrant
+      ctx.fillRect(
+        width + j * pixelWidth,
+        (cnst.ROW_LEN - i) * pixelHeight,
+        pixelWidth,
+        pixelHeight
+      );
+
+      // Bottom-left quadrant
+      ctx.fillRect(
+        (cnst.COL_LEN - j) * pixelWidth,
+        height + i * pixelHeight,
+        pixelWidth,
+        pixelHeight
+      );
+    }
+  }
+
+  requestAnimationFrame(updateCanvas);
 };
 
 // ----- INITIALIZE APP ----- //
