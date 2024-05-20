@@ -5,6 +5,8 @@ const cnst = {
   FFT_SIZE: 128,
 };
 
+let animationRequestId;
+
 // ----- SONGS ----- //
 const songs = [
   {
@@ -49,6 +51,10 @@ const ui = {
   mutedBtn: document.getElementById("muted-btn"),
   hideBtn: document.getElementById("hide-btn"),
   showBtn: document.getElementById("show-btn"),
+  // scene change buttons
+  gridSceneBtn: document.getElementById("canvas-rect-grid"),
+  linesSceneBtn: document.getElementById("canvas-lines"),
+  sphereSceneBtn: document.getElementById("three-d-sphere"),
   // player progress bars
   songProgress: document.getElementById("controls-progress"),
   volumeProgress: document.getElementById("volume-progress"),
@@ -110,7 +116,7 @@ const state = {
   setIsPlaylistHidden: (newVal) => {
     state.isPlaylistHidden = newVal;
   },
-  visualization: "canvas",
+  visualization: "grid",
   setVisualization: (newVal) => {
     state.visualization = newVal;
   },
@@ -197,9 +203,15 @@ ui.makeSmallBtn = document.getElementById("make-small-btn");
 /* while the audio is playing, it should be updating the scene where the audio is visualized. TODO: construct a scene changing logic */
 ui.audio.addEventListener("play", () => {
   if (state.visualization === "grid") {
-    updateGrids();
-  } else {
+    if (animationRequestId) {
+      cancelAnimationFrame(animationRequestId);
+    }
     updateCanvasRectGrid();
+  } else if (state.visualization === "lines") {
+    if (animationRequestId) {
+      cancelAnimationFrame(animationRequestId);
+    }
+    updateCanvas();
   }
 });
 
@@ -233,6 +245,27 @@ ui.audio.addEventListener("ended", () => {
 });
 
 // button event handlers
+
+ui.gridSceneBtn.addEventListener("click", () => {
+  state.setVisualization("grid");
+  console.log(state.visualization);
+  ui.audio.pause();
+  ui.audio.play();
+});
+
+ui.sphereSceneBtn.addEventListener("click", () => {
+  state.setVisualization("sphere");
+  console.log(state.visualization);
+  ui.audio.pause();
+  ui.audio.play();
+});
+
+ui.linesSceneBtn.addEventListener("click", () => {
+  state.setVisualization("lines");
+  console.log(state.visualization);
+  ui.audio.pause();
+  ui.audio.play();
+});
 
 // makes playlist element shrink and dissappear
 ui.makeSmallBtn.addEventListener("click", () => {
@@ -412,88 +445,12 @@ ui.volumeProgress.addEventListener("mouseleave", () =>
   state.setVolumeProgMousedown(false)
 );
 
-// ----- GRID CREATION FUNCTIONS ----- //
-const createGrid = (
-  gridContainerId,
-  generateId,
-  iStart,
-  iEnd,
-  jStart,
-  jEnd
-) => {
-  const gridContainer = document.getElementById(gridContainerId);
-  for (let i = iStart; i !== iEnd; iEnd > iStart ? i++ : i--) {
-    for (let j = jStart; j !== jEnd; jEnd > jStart ? j++ : j--) {
-      const gridItem = document.createElement("div");
-      gridItem.classList.add("grid-item");
-      gridItem.setAttribute("id", generateId(i, j));
-      gridContainer.appendChild(gridItem);
-    }
-  }
-};
-const createGrids = () => {
-  ui.scene.style.display = "grid";
-  ui.scene.style.gridTemplateColumns = "1fr 1fr";
-  ui.scene.style.gridTemplateRows = "1fr 1fr";
-  ui.scene.style.gap = "2px";
-
-  createGrid(
-    "left-grid-container",
-    (i, j) => `left-${i}-${j}`,
-    cnst.COL_LEN - 1,
-    -1,
-    cnst.ROW_LEN - 1,
-    -1
-  );
-  createGrid(
-    "right-grid-container",
-    (i, j) => `right-${i}-${j}`,
-    cnst.COL_LEN - 1,
-    -1,
-    0,
-    cnst.ROW_LEN
-  );
-  createGrid(
-    "bottom-left-grid-container",
-    (i, j) => `bottom-left-${i}-${j}`,
-    0,
-    cnst.COL_LEN,
-    cnst.ROW_LEN - 1,
-    -1
-  );
-  createGrid(
-    "bottom-right-grid-container",
-    (i, j) => `bottom-right-${i}-${j}`,
-    0,
-    cnst.COL_LEN,
-    0,
-    cnst.ROW_LEN
-  );
-};
 const getHslColor = (index, soundIntensity) => {
   const hue = (360 / 30) * index;
   const saturation = "100%";
   const lightness = 50 + (soundIntensity / 60) * 10 + "%";
   const color = `hsl(${hue}, ${saturation}, ${lightness})`;
   return color;
-};
-const updateGrids = () => {
-  analyser.getByteFrequencyData(dataArray);
-  for (let j = 0; j < cnst.ROW_LEN; j++) {
-    const soundIntensity = Math.floor(dataArray[j] / 20);
-    for (let i = 0; i < cnst.COL_LEN; i++) {
-      const color = getHslColor(i, soundIntensity);
-      document.getElementById(`left-${i}-${j}`).style.backgroundColor =
-        i < soundIntensity ? color : "#000";
-      document.getElementById(`right-${i}-${j}`).style.backgroundColor =
-        i < soundIntensity ? color : "#000";
-      document.getElementById(`bottom-left-${i}-${j}`).style.backgroundColor =
-        i < soundIntensity ? color : "#000";
-      document.getElementById(`bottom-right-${i}-${j}`).style.backgroundColor =
-        i < soundIntensity ? color : "#000";
-    }
-  }
-  requestAnimationFrame(updateGrids);
 };
 
 // ----- HELPER FUNCTIONS ----- //
@@ -548,11 +505,6 @@ const updateProgress = (progress, percent) => {
 const initializeApp = () => {
   createScene(state.visualization);
 
-  if (state.visualization === "grid") {
-    createGrids();
-  } else if (state.visualization === "canvas") {
-    // createCanvas
-  }
   togglePlaybackBtn();
   toggleVolumeBtn();
 
@@ -696,12 +648,6 @@ const initializeCurrSongData = () => {
 const createScene = (sceneType) => {
   switch (sceneType) {
     case "grid":
-      ui.scene.innerHTML = `<div class="grid-container" id="left-grid-container"></div>
-      <div class="grid-container" id="right-grid-container"></div>
-      <div class="grid-container" id="bottom-left-grid-container"></div>
-      <div class="grid-container" id="bottom-right-grid-container"></div>`;
-      break;
-    case "canvas":
       ui.scene.innerHTML = `<canvas width="100%" height="100%">`;
       break;
   }
@@ -760,7 +706,41 @@ const updateCanvasRectGrid = () => {
     }
   }
 
-  requestAnimationFrame(updateCanvasRectGrid);
+  if (state.visualization === "grid") {
+    animationRequestId = requestAnimationFrame(updateCanvasRectGrid);
+  }
+};
+
+const updateCanvas = () => {
+  const canvas = ui.scene.querySelector("canvas");
+  const ctx = canvas.getContext("2d");
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+  analyser.getByteFrequencyData(dataArray);
+  const width = canvas.width;
+  const height = canvas.height;
+  const centerY = height / 2;
+
+  ctx.clearRect(0, 0, width, height); // Clear the canvas
+
+  ctx.beginPath();
+  ctx.moveTo(0, centerY);
+
+  // Draw the wave
+  for (let i = 0; i < dataArray.length; i++) {
+    const x = (i / dataArray.length) * width;
+    const y = centerY - (dataArray[i] / 255) * centerY; // Normalize the data to fit the canvas height
+
+    ctx.lineTo(x, y);
+  }
+
+  ctx.strokeStyle = "#00f"; // Set the stroke color for the wave
+  ctx.lineWidth = 2; // Set the line width for the wave
+  ctx.stroke();
+
+  if (state.visualization === "lines") {
+    animationRequestId = requestAnimationFrame(updateCanvas);
+  }
 };
 
 // ----- INITIALIZE APP ----- //

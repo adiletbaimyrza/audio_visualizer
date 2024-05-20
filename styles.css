@@ -421,6 +421,21 @@ body {
   height: 40px;
 }
 
+#vis-change-btns {
+  display: flex;
+  position: absolute;
+  right: 0;
+  top: 0;
+
+  button {
+    border-radius: 2px;
+    font-size: 10px;
+    color: var(--white);
+    padding: 5px;
+    background-color: var(--lighter-black);
+  }
+}
+
 @keyframes bounce {
   10% {
     transform: scaleY(0.3);
