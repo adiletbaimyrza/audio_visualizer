@@ -211,7 +211,12 @@ ui.audio.addEventListener("play", () => {
     if (animationRequestId) {
       cancelAnimationFrame(animationRequestId);
     }
-    updateCanvas();
+    updateLinesScene();
+  } else if (state.visualization === "sphere") {
+    if (animationRequestId) {
+      cancelAnimationFrame(animationRequestId);
+    }
+    updateBackground();
   }
 });
 
@@ -711,35 +716,107 @@ const updateCanvasRectGrid = () => {
   }
 };
 
-const updateCanvas = () => {
+let mouseX = window.innerWidth / 2;
+let mouseY = window.innerHeight / 2;
+
+const updateMousePosition = (event) => {
+  mouseX = event.clientX;
+  mouseY = event.clientY;
+};
+
+window.addEventListener("mousemove", updateMousePosition);
+
+const updateBackground = () => {
   const canvas = ui.scene.querySelector("canvas");
   const ctx = canvas.getContext("2d");
   canvas.width = window.innerWidth;
   canvas.height = window.innerHeight;
+
   analyser.getByteFrequencyData(dataArray);
+
+  // Calculate the average sound intensity
+  const avgIntensity =
+    dataArray.reduce((acc, val) => acc + val, 0) / dataArray.length;
+  const intensityRatio = avgIntensity / 255; // Normalize the intensity (0 to 1)
+
+  // Calculate the colors based on intensity
+  const centerColor = `rgb(
+    ${Math.floor(200 * intensityRatio)},
+    ${Math.floor(216 * intensityRatio)},
+    ${Math.floor(230 * intensityRatio)}
+  )`;
+
+  const edgeColor = `rgb(
+    ${Math.floor(0)},
+    ${Math.floor(0)},
+    ${Math.floor(139 * intensityRatio)}
+  )`;
+
+  // Create a radial gradient with the mouse position as the center
+  const gradient = ctx.createRadialGradient(
+    mouseX,
+    mouseY,
+    0, // Inner circle
+    mouseX,
+    mouseY,
+    canvas.width / 2 // Outer circle
+  );
+
+  gradient.addColorStop(0, centerColor);
+  gradient.addColorStop(1, edgeColor);
+
+  // Set the canvas background color
+  ctx.fillStyle = gradient;
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+  if (state.visualization === "sphere") {
+    animationRequestId = requestAnimationFrame(updateBackground);
+  }
+};
+
+const updateLinesScene = () => {
+  const canvas = ui.scene.querySelector("canvas");
+  const ctx = canvas.getContext("2d");
+
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+
+  analyser.getByteFrequencyData(dataArray);
+
   const width = canvas.width;
   const height = canvas.height;
   const centerY = height / 2;
+  const centerX = width / 2;
 
   ctx.clearRect(0, 0, width, height); // Clear the canvas
 
   ctx.beginPath();
-  ctx.moveTo(0, centerY);
 
   // Draw the wave
-  for (let i = 0; i < dataArray.length; i++) {
-    const x = (i / dataArray.length) * width;
+  for (let i = dataArray.length - 1; i > -1; i--) {
+    const x = centerX - (i / dataArray.length) * centerX;
     const y = centerY - (dataArray[i] / 255) * centerY; // Normalize the data to fit the canvas height
 
-    ctx.lineTo(x, y);
+    if (!(x === 0 || y === 0)) {
+      ctx.lineTo(x, y);
+    }
+  }
+
+  for (let i = 0; i < dataArray.length; i++) {
+    const x = centerX + (i / dataArray.length) * centerX;
+    const y = centerY - (dataArray[i] / 255) * centerY; // Normalize the data to fit the canvas height
+
+    if (!(x === 0 || y === 0)) {
+      ctx.lineTo(x, y);
+    }
   }
 
   ctx.strokeStyle = "#00f"; // Set the stroke color for the wave
-  ctx.lineWidth = 2; // Set the line width for the wave
+  ctx.lineWidth = 10; // Set the line width for the wave
   ctx.stroke();
 
   if (state.visualization === "lines") {
-    animationRequestId = requestAnimationFrame(updateCanvas);
+    animationRequestId = requestAnimationFrame(updateLinesScene);
   }
 };
 
