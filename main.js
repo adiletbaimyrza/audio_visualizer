@@ -37,6 +37,8 @@ const songs = [
 const ui = {
   // audio
   audio: document.getElementById("audio"),
+  // player
+  player: document.getElementById("player"),
   // player buttons
   playBtn: document.getElementById("play-btn"),
   pauseBtn: document.getElementById("pause-btn"),
@@ -50,8 +52,6 @@ const ui = {
   // player progress bars
   songProgress: document.getElementById("controls-progress"),
   volumeProgress: document.getElementById("volume-progress"),
-
-  player: document.getElementById("player"),
   // player durations
   currDuration: document.getElementById("current-duration"),
   totalDuration: document.getElementById("total-duration"),
@@ -59,7 +59,6 @@ const ui = {
   playlist: document.getElementById("playlist"),
   // current song
   currSong: document.getElementById("current-song"),
-
   // scene
   scene: document.getElementById("container"),
 };
@@ -200,7 +199,7 @@ ui.audio.addEventListener("play", () => {
   if (state.visualization === "grid") {
     updateGrids();
   } else {
-    updateCanvas();
+    updateCanvasRectGrid();
   }
 });
 
@@ -433,6 +432,11 @@ const createGrid = (
   }
 };
 const createGrids = () => {
+  ui.scene.style.display = "grid";
+  ui.scene.style.gridTemplateColumns = "1fr 1fr";
+  ui.scene.style.gridTemplateRows = "1fr 1fr";
+  ui.scene.style.gap = "2px";
+
   createGrid(
     "left-grid-container",
     (i, j) => `left-${i}-${j}`,
@@ -703,7 +707,7 @@ const createScene = (sceneType) => {
   }
 };
 
-const updateCanvas = () => {
+const updateCanvasRectGrid = () => {
   const canvas = ui.scene.querySelector("canvas");
   const ctx = canvas.getContext("2d");
   canvas.width = window.innerWidth;
@@ -756,7 +760,7 @@ const updateCanvas = () => {
     }
   }
 
-  requestAnimationFrame(updateCanvas);
+  requestAnimationFrame(updateCanvasRectGrid);
 };
 
 // ----- INITIALIZE APP ----- //
