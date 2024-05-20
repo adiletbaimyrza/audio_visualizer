@@ -716,16 +716,6 @@ const updateCanvasRectGrid = () => {
   }
 };
 
-let mouseX = window.innerWidth / 2;
-let mouseY = window.innerHeight / 2;
-
-const updateMousePosition = (event) => {
-  mouseX = event.clientX;
-  mouseY = event.clientY;
-};
-
-window.addEventListener("mousemove", updateMousePosition);
-
 const updateBackground = () => {
   const canvas = ui.scene.querySelector("canvas");
   const ctx = canvas.getContext("2d");
@@ -741,7 +731,7 @@ const updateBackground = () => {
 
   // Calculate the colors based on intensity
   const centerColor = `rgb(
-    ${Math.floor(200 * intensityRatio)},
+    ${Math.floor(173 * intensityRatio)},
     ${Math.floor(216 * intensityRatio)},
     ${Math.floor(230 * intensityRatio)}
   )`;
@@ -752,13 +742,13 @@ const updateBackground = () => {
     ${Math.floor(139 * intensityRatio)}
   )`;
 
-  // Create a radial gradient with the mouse position as the center
+  // Create a radial gradient
   const gradient = ctx.createRadialGradient(
-    mouseX,
-    mouseY,
+    canvas.width / 2,
+    canvas.height / 2,
     0, // Inner circle
-    mouseX,
-    mouseY,
+    canvas.width / 2,
+    canvas.height / 2,
     canvas.width / 2 // Outer circle
   );
 
