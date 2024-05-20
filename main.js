@@ -716,10 +716,10 @@ const updateCanvasRectGrid = () => {
   const width = canvas.width / 2;
   const height = canvas.height / 2;
 
-  for (let j = 0; j < cnst.ROW_LEN; j++) {
+  for (let j = 0; j < cnst.ROW_LEN + 1; j++) {
     const soundIntensity = Math.floor(dataArray[j] / 12);
 
-    for (let i = 0; i < cnst.COL_LEN; i++) {
+    for (let i = 0; i < cnst.COL_LEN + 1; i++) {
       const color = getHslColor(i, soundIntensity);
       const pixelHeight = height / cnst.ROW_LEN;
       const pixelWidth = width / cnst.COL_LEN;
