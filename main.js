@@ -798,16 +798,19 @@ const updateLinesScene = () => {
     ctx.stroke();
   };
 
-  const generateControlPoints = (direction, upsideDown) => {
+  const generateControlPoints = (direction) => {
     const points = [];
+    let upsideDown = false;
     for (let i = 0; i < dataArray.length; i += 8) {
       let x, y;
       if (!upsideDown) {
         x = centerX + direction * (i / dataArray.length) * centerX;
         y = centerY - (dataArray[i] / 255) * centerY * 0.9;
+        upsideDown = true;
       } else {
         x = centerX + direction * (i / dataArray.length) * centerX;
         y = centerY + (dataArray[i] / 255) * centerY * 0.9;
+        upsideDown = false;
       }
       points.push({ x, y });
     }
@@ -816,13 +819,9 @@ const updateLinesScene = () => {
 
   const upperLeftControlPoints = generateControlPoints(-1, false);
   const upperRightControlPoints = generateControlPoints(1, false);
-  const lowerLeftControlPoints = generateControlPoints(-1, true);
-  const lowerRightControlPoints = generateControlPoints(1, true);
 
   drawSmoothLine(ctx, upperLeftControlPoints);
   drawSmoothLine(ctx, upperRightControlPoints);
-  drawSmoothLine(ctx, lowerLeftControlPoints);
-  drawSmoothLine(ctx, lowerRightControlPoints);
 
   if (state.visualization === "lines") {
     animationRequestId = requestAnimationFrame(updateLinesScene);
