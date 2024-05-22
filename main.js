@@ -51,6 +51,8 @@ const ui = {
   mutedBtn: document.getElementById("muted-btn"),
   hideBtn: document.getElementById("hide-btn"),
   showBtn: document.getElementById("show-btn"),
+  forwardStepBtn: document.getElementById("forward-step-btn"),
+  backwardStepBtn: document.getElementById("backward-step-btn"),
   // scene change buttons
   gridSceneBtn: document.getElementById("canvas-rect-grid"),
   linesSceneBtn: document.getElementById("canvas-lines"),
@@ -119,6 +121,10 @@ const state = {
   scene: "grid",
   setScene: (newVal) => {
     state.scene = newVal;
+  },
+  songId: 0,
+  setSongId: (newVal) => {
+    state.songId = newVal;
   },
 };
 
@@ -250,6 +256,168 @@ ui.audio.addEventListener("ended", () => {
 });
 
 // button event handlers
+
+ui.forwardStepBtn.addEventListener("click", () => {
+  const newSongId = Math.abs(state.songId + 1) % 4;
+  state.setSongId(newSongId);
+  const nextSong = songs[state.songId];
+
+  songs.forEach((song) => {
+    document
+      .getElementById(`${song.path}-playlist-song`)
+      .querySelector(".util-btn-cell").style.color = "var(--grey)";
+    document
+      .getElementById(`${song.path}-playlist-song`)
+      .querySelector("h3").style.color = "var(--white)";
+  });
+
+  document
+    .getElementById(`${nextSong.path}-playlist-song`)
+    .querySelector(".util-btn-cell").style.color = "var(--yellow)";
+  document
+    .getElementById(`${nextSong.path}-playlist-song`)
+    .querySelector("h3").style.color = "var(--yellow)";
+
+  if (state.isPlaying && state.currSong === nextSong) {
+    state.setIsPlaying(false);
+
+    togglePlaybackBtn();
+
+    ui.audio.pause();
+
+    document
+      .getElementById(`${nextSong.path}-playlist-song`)
+      .querySelector(".now-playing").style.display = "none";
+    document
+      .getElementById(`${nextSong.path}-playlist-song`)
+      .querySelector(".playlist-pause-btn").style.display = "none";
+    document
+      .getElementById(`${nextSong.path}-playlist-song`)
+      .querySelector("p").style.display = "block";
+  } else {
+    ui.audio.src = `/audio_visualizer/audio/${nextSong.path}.mp3`;
+
+    if (audioCtx.state === "suspended") audioCtx.resume();
+
+    audioSource.connect(analyser);
+    analyser.connect(audioCtx.destination);
+
+    ui.audio.play();
+
+    ui.currSong.poster.src = `/auidio_visualizer/posters/${nextSong.path}.jpg`;
+    ui.currSong.poster.alt = `${nextSong.name} by ${nextSong.artist}`;
+    ui.currSong.name.textContent = nextSong.name;
+    ui.currSong.artist.textContent = nextSong.artist;
+
+    state.currSong = nextSong;
+
+    state.setIsPlaying(true);
+    togglePlaybackBtn();
+
+    songs.forEach((song) => {
+      document
+        .getElementById(`${song.path}-playlist-song`)
+        .querySelector(".now-playing").style.display = "none";
+      document
+        .getElementById(`${song.path}-playlist-song`)
+        .querySelector("p").style.display = "block";
+    });
+
+    document
+      .getElementById(`${nextSong.path}-playlist-song`)
+      .querySelector(".playlist-play-btn").style.display = "none";
+    document
+      .getElementById(`${nextSong.path}-playlist-song`)
+      .querySelector(".playlist-pause-btn").style.display = "none";
+    document
+      .getElementById(`${nextSong.path}-playlist-song`)
+      .querySelector("p").style.display = "none";
+    document
+      .getElementById(`${nextSong.path}-playlist-song`)
+      .querySelector(".now-playing").style.display = "flex";
+  }
+});
+
+ui.backwardStepBtn.addEventListener("click", () => {
+  const newSongId = state.songId === 0 ? 4 : state.songId - 1;
+  state.setSongId(newSongId);
+  const prevSong = songs[state.songId];
+
+  songs.forEach((song) => {
+    document
+      .getElementById(`${song.path}-playlist-song`)
+      .querySelector(".util-btn-cell").style.color = "var(--grey)";
+    document
+      .getElementById(`${song.path}-playlist-song`)
+      .querySelector("h3").style.color = "var(--white)";
+  });
+
+  document
+    .getElementById(`${prevSong.path}-playlist-song`)
+    .querySelector(".util-btn-cell").style.color = "var(--yellow)";
+  document
+    .getElementById(`${prevSong.path}-playlist-song`)
+    .querySelector("h3").style.color = "var(--yellow)";
+
+  if (state.isPlaying && state.currSong === prevSong) {
+    state.setIsPlaying(false);
+
+    togglePlaybackBtn();
+
+    ui.audio.pause();
+
+    document
+      .getElementById(`${prevSong.path}-playlist-song`)
+      .querySelector(".now-playing").style.display = "none";
+    document
+      .getElementById(`${prevSong.path}-playlist-song`)
+      .querySelector(".playlist-pause-btn").style.display = "none";
+    document
+      .getElementById(`${prevSong.path}-playlist-song`)
+      .querySelector("p").style.display = "block";
+  } else {
+    ui.audio.src = `/audio_visualizer/audio/${prevSong.path}.mp3`;
+
+    if (audioCtx.state === "suspended") audioCtx.resume();
+
+    audioSource.connect(analyser);
+    analyser.connect(audioCtx.destination);
+
+    ui.audio.play();
+
+    ui.currSong.poster.src = `/audio_visualizer/posters/${prevSong.path}.jpg`;
+    ui.currSong.poster.alt = `${prevSong.name} by ${prevSong.artist}`;
+    ui.currSong.name.textContent = prevSong.name;
+    ui.currSong.artist.textContent = prevSong.artist;
+
+    state.currSong = prevSong;
+
+    state.setIsPlaying(true);
+    togglePlaybackBtn();
+
+    songs.forEach((song) => {
+      document
+        .getElementById(`${song.path}-playlist-song`)
+        .querySelector(".now-playing").style.display = "none";
+      document
+        .getElementById(`${song.path}-playlist-song`)
+        .querySelector("p").style.display = "block";
+    });
+
+    document
+      .getElementById(`${prevSong.path}-playlist-song`)
+      .querySelector(".playlist-play-btn").style.display = "none";
+    document
+      .getElementById(`${prevSong.path}-playlist-song`)
+      .querySelector(".playlist-pause-btn").style.display = "none";
+    document
+      .getElementById(`${prevSong.path}-playlist-song`)
+      .querySelector("p").style.display = "none";
+    document
+      .getElementById(`${prevSong.path}-playlist-song`)
+      .querySelector(".now-playing").style.display = "flex";
+  }
+});
 
 ui.gridSceneBtn.addEventListener("click", () => {
   state.setScene("grid");
