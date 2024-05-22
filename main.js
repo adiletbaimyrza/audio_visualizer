@@ -206,17 +206,17 @@ ui.audio.addEventListener("play", () => {
     if (animationRequestId) {
       cancelAnimationFrame(animationRequestId);
     }
-    updateCanvasRectGrid();
+    updateGridScene();
   } else if (state.visualization === "lines") {
     if (animationRequestId) {
       cancelAnimationFrame(animationRequestId);
     }
-    updateLinesScene();
+    updateWaveScene();
   } else if (state.visualization === "sphere") {
     if (animationRequestId) {
       cancelAnimationFrame(animationRequestId);
     }
-    updateBackground();
+    updateBackgroundScene();
   }
 });
 
@@ -654,7 +654,7 @@ const createScene = (sceneType) => {
   }
 };
 
-const updateCanvasRectGrid = () => {
+const updateGridScene = () => {
   const canvas = ui.scene.querySelector("canvas");
   const ctx = canvas.getContext("2d");
   canvas.width = window.innerWidth;
@@ -708,11 +708,11 @@ const updateCanvasRectGrid = () => {
   }
 
   if (state.visualization === "grid") {
-    animationRequestId = requestAnimationFrame(updateCanvasRectGrid);
+    animationRequestId = requestAnimationFrame(updateGridScene);
   }
 };
 
-const updateBackground = () => {
+const updateBackgroundScene = () => {
   const canvas = ui.scene.querySelector("canvas");
   const ctx = canvas.getContext("2d");
   canvas.width = window.innerWidth;
@@ -756,11 +756,11 @@ const updateBackground = () => {
   ctx.fillRect(0, 0, canvas.width, canvas.height);
 
   if (state.visualization === "sphere") {
-    animationRequestId = requestAnimationFrame(updateBackground);
+    animationRequestId = requestAnimationFrame(updateBackgroundScene);
   }
 };
 
-const updateLinesScene = () => {
+const updateWaveScene = () => {
   const canvas = ui.scene.querySelector("canvas");
   const ctx = canvas.getContext("2d");
 
@@ -824,7 +824,7 @@ const updateLinesScene = () => {
   drawSmoothLine(ctx, upperRightControlPoints);
 
   if (state.visualization === "lines") {
-    animationRequestId = requestAnimationFrame(updateLinesScene);
+    animationRequestId = requestAnimationFrame(updateWaveScene);
   }
 };
 
