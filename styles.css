@@ -91,12 +91,15 @@ body {
       }
       #pause-btn,
       #play-btn {
-        margin: 0 30px 10px 30px;
+        margin: 0 10px 10px 10px;
       }
 
       #backward-btn,
-      #forward-btn {
-        margin-bottom: 10px;
+      #forward-btn,
+      #forward-step-btn,
+      #backward-step-btn {
+        margin: 0 5px 10px 5px;
+
         img {
           height: 20px;
         }
