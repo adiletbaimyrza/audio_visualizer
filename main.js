@@ -304,7 +304,7 @@ ui.forwardStepBtn.addEventListener("click", () => {
 
     ui.audio.play();
 
-    ui.currSong.poster.src = `/auidio_visualizer/posters/${nextSong.path}.jpg`;
+    ui.currSong.poster.src = `/audio_visualizer/posters/${nextSong.path}.jpg`;
     ui.currSong.poster.alt = `${nextSong.name} by ${nextSong.artist}`;
     ui.currSong.name.textContent = nextSong.name;
     ui.currSong.artist.textContent = nextSong.artist;
