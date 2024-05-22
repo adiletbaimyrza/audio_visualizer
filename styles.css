@@ -17,6 +17,10 @@ button {
   --white: #ffffff;
   --grey: #808080;
   --yellow: #e8d940;
+  --scene-bg: #000000;
+  --scene-color: #4300c0;
+  --card-bg: #0e0e37;
+  --card-btn-bg: #1a085a;
 }
 
 /* ----- GLOBAL FONTS ----- */
@@ -38,10 +42,10 @@ body {
   bottom: 0;
   display: grid;
   grid-template-columns: repeat(12, 1fr);
-  background-color: var(--black);
+  background-color: var(--card-bg);
   color: var(--white);
   width: 100%;
-  padding: 12px;
+  padding: 20px 12px 12px 12px;
 
   #current-song {
     grid-column: span 3;
@@ -148,7 +152,7 @@ body {
 
   #hide-btn {
     border-radius: 2px;
-    font-size: 10px;
+    cursor: pointer;
     color: var(--white);
     position: absolute;
     top: 10px;
@@ -156,12 +160,16 @@ body {
     display: flex;
     align-items: center;
     padding: 5px;
-    background-color: var(--lighter-black);
+    background-color: var(--card-btn-bg);
 
     img {
       width: 10px;
       height: 10px;
     }
+  }
+
+  #hide-btn:hover {
+    opacity: 0.6;
   }
 }
 
@@ -174,12 +182,12 @@ body {
   display: flex;
   flex-direction: column;
   border-radius: 10px;
-  background-color: var(--black);
+  background-color: var(--card-bg);
   border-collapse: collapse;
   transform-origin: 1% 98%;
 
   thead {
-    padding: 15px 20px 10px 20px;
+    padding: 30px 20px 10px 20px;
 
     th {
       color: var(--grey);
@@ -277,12 +285,12 @@ body {
   }
 
   .playlist-song:hover {
-    background-color: var(--lighter-black);
+    background-color: var(--card-btn-bg);
   }
 
   #make-small-btn {
     position: absolute;
-
+    color: #c7c7c7;
     right: 10px;
     top: 10px;
     display: none;
@@ -307,31 +315,25 @@ body {
   display: none;
   position: absolute;
   border-radius: 2px;
-  font-size: 10px;
   color: var(--white);
   padding: 5px;
-  background-color: var(--lighter-black);
+  background-color: var(--card-btn-bg);
 }
 
 #make-big-btn {
+  color: var(--white);
   position: absolute;
   display: none;
-  background-color: var(--black);
+  background-color: var(--card-bg);
   padding: 8px 10px 7px 10px;
   border-radius: 5px;
   left: 10px;
   bottom: 120px;
   cursor: pointer;
+}
 
-  img {
-    width: 16px;
-    height: 16px;
-    opacity: 0.5;
-  }
-
-  img:hover {
-    opacity: 1;
-  }
+#make-big-btn:hover {
+  opacity: 0.8;
 }
 
 .main {
@@ -363,12 +365,7 @@ body {
 
 #container {
   flex-grow: 1;
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  grid-template-rows: 1fr 1fr;
-  gap: 2px;
-
-  background-color: #1d1717;
+  background-color: var(--scene-bg);
 }
 
 #left-grid-container {
@@ -423,6 +420,21 @@ body {
 .volume-icon {
   width: 40px;
   height: 40px;
+}
+
+#vis-change-btns {
+  display: flex;
+  position: absolute;
+  right: 0;
+  top: 0;
+
+  button {
+    border-radius: 2px;
+    margin-left: 5px;
+    color: var(--white);
+    padding: 5px;
+    background-color: var(--card-btn-bg);
+  }
 }
 
 @keyframes bounce {
@@ -488,13 +500,13 @@ body {
     transform: translateY(0);
   }
   to {
-    transform: translateY(104px);
+    transform: translateY(112px);
   }
 }
 
 @keyframes slideUp {
   from {
-    transform: translateY(104px);
+    transform: translateY(112px);
   }
   to {
     transform: translateY(0);

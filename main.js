@@ -1,9 +1,11 @@
 // ----- CONSTANTS ----- //
 const cnst = {
-  ROW_LEN: 64,
-  COL_LEN: 25,
+  ROW_LEN: 50,
+  COL_LEN: 50,
   FFT_SIZE: 128,
 };
+
+let animationRequestId;
 
 // ----- SONGS ----- //
 const songs = [
@@ -37,6 +39,8 @@ const songs = [
 const ui = {
   // audio
   audio: document.getElementById("audio"),
+  // player
+  player: document.getElementById("player"),
   // player buttons
   playBtn: document.getElementById("play-btn"),
   pauseBtn: document.getElementById("pause-btn"),
@@ -47,11 +51,13 @@ const ui = {
   mutedBtn: document.getElementById("muted-btn"),
   hideBtn: document.getElementById("hide-btn"),
   showBtn: document.getElementById("show-btn"),
+  // scene change buttons
+  gridSceneBtn: document.getElementById("canvas-rect-grid"),
+  linesSceneBtn: document.getElementById("canvas-lines"),
+  sphereSceneBtn: document.getElementById("three-d-sphere"),
   // player progress bars
   songProgress: document.getElementById("controls-progress"),
   volumeProgress: document.getElementById("volume-progress"),
-
-  player: document.getElementById("player"),
   // player durations
   currDuration: document.getElementById("current-duration"),
   totalDuration: document.getElementById("total-duration"),
@@ -59,6 +65,8 @@ const ui = {
   playlist: document.getElementById("playlist"),
   // current song
   currSong: document.getElementById("current-song"),
+  // scene
+  scene: document.getElementById("container"),
 };
 
 // references to the children of durations
@@ -107,6 +115,10 @@ const state = {
   isPlaylistHidden: false,
   setIsPlaylistHidden: (newVal) => {
     state.isPlaylistHidden = newVal;
+  },
+  scene: "grid",
+  setScene: (newVal) => {
+    state.scene = newVal;
   },
 };
 
@@ -171,7 +183,7 @@ const populatePlaylist = () => {
 
   const makeSmallBtn = `
     <button id="make-small-btn" type="button" title="Hide playlist">
-      <img src="/audio_visualizer/svg/make-small.svg" alt="make small icon" />
+      Hide playlist
     </button>
   `;
 
@@ -190,7 +202,22 @@ ui.makeSmallBtn = document.getElementById("make-small-btn");
 
 /* while the audio is playing, it should be updating the scene where the audio is visualized. TODO: construct a scene changing logic */
 ui.audio.addEventListener("play", () => {
-  updateGrids();
+  if (state.scene === "grid") {
+    if (animationRequestId) {
+      cancelAnimationFrame(animationRequestId);
+    }
+    updateGridScene();
+  } else if (state.scene === "waves") {
+    if (animationRequestId) {
+      cancelAnimationFrame(animationRequestId);
+    }
+    updateWaveScene();
+  } else if (state.scene === "background") {
+    if (animationRequestId) {
+      cancelAnimationFrame(animationRequestId);
+    }
+    updateBackgroundScene();
+  }
 });
 
 ui.audio.addEventListener("timeupdate", () => {
@@ -224,13 +251,34 @@ ui.audio.addEventListener("ended", () => {
 
 // button event handlers
 
+ui.gridSceneBtn.addEventListener("click", () => {
+  state.setScene("grid");
+  console.log(state.scene);
+  ui.audio.pause();
+  ui.audio.play();
+});
+
+ui.sphereSceneBtn.addEventListener("click", () => {
+  state.setScene("background");
+  console.log(state.scene);
+  ui.audio.pause();
+  ui.audio.play();
+});
+
+ui.linesSceneBtn.addEventListener("click", () => {
+  state.setScene("waves");
+  console.log(state.scene);
+  ui.audio.pause();
+  ui.audio.play();
+});
+
 // makes playlist element shrink and dissappear
 ui.makeSmallBtn.addEventListener("click", () => {
   state.setIsPlaylistHidden(true);
 
   if (state.isPlayerHidden) {
-    ui.makeBigBtn.style.translate = "0 104px";
-    ui.playlist.style.translate = "0 104px";
+    ui.makeBigBtn.style.translate = "0 112px";
+    ui.playlist.style.translate = "0 112px";
   }
 
   ui.makeBigBtn.style.display = "block";
@@ -255,11 +303,11 @@ ui.hideBtn.addEventListener("click", () => {
   ui.player.style.animation = "2s hide cubic-bezier(0.19, 1, 0.22, 1) forwards";
 
   if (state.isPlaylistHidden) {
-    ui.playlist.style.translate = "0 104px";
+    ui.playlist.style.translate = "0 112px";
     ui.makeBigBtn.style.animation = `2s slideDown cubic-bezier(0.19, 1, 0.22, 1) forwards`;
   } else {
     ui.playlist.style.animation = `2s slideDown cubic-bezier(0.19, 1, 0.22, 1) forwards`;
-    ui.makeBigBtn.style.translate = "0 104px";
+    ui.makeBigBtn.style.translate = "0 112px";
   }
 });
 
@@ -402,85 +450,6 @@ ui.volumeProgress.addEventListener("mouseleave", () =>
   state.setVolumeProgMousedown(false)
 );
 
-// ----- GRID CREATION FUNCTIONS ----- //
-const createGrid = (
-  gridContainerId,
-  generateId,
-  iStart,
-  iEnd,
-  jStart,
-  jEnd
-) => {
-  const gridContainer = document.getElementById(gridContainerId);
-  for (let i = iStart; i !== iEnd; iEnd > iStart ? i++ : i--) {
-    for (let j = jStart; j !== jEnd; jEnd > jStart ? j++ : j--) {
-      const gridItem = document.createElement("div");
-      gridItem.classList.add("grid-item");
-      gridItem.setAttribute("id", generateId(i, j));
-      gridContainer.appendChild(gridItem);
-    }
-  }
-};
-const createGrids = () => {
-  createGrid(
-    "left-grid-container",
-    (i, j) => `left-${i}-${j}`,
-    cnst.COL_LEN - 1,
-    -1,
-    cnst.ROW_LEN - 1,
-    -1
-  );
-  createGrid(
-    "right-grid-container",
-    (i, j) => `right-${i}-${j}`,
-    cnst.COL_LEN - 1,
-    -1,
-    0,
-    cnst.ROW_LEN
-  );
-  createGrid(
-    "bottom-left-grid-container",
-    (i, j) => `bottom-left-${i}-${j}`,
-    0,
-    cnst.COL_LEN,
-    cnst.ROW_LEN - 1,
-    -1
-  );
-  createGrid(
-    "bottom-right-grid-container",
-    (i, j) => `bottom-right-${i}-${j}`,
-    0,
-    cnst.COL_LEN,
-    0,
-    cnst.ROW_LEN
-  );
-};
-const getHslColor = (index, soundIntensity) => {
-  const hue = (360 / 30) * index;
-  const saturation = "100%";
-  const lightness = 50 + (soundIntensity / 30) * 50 + "%";
-  const color = `hsl(${hue}, ${saturation}, ${lightness})`;
-  return color;
-};
-const updateGrids = () => {
-  analyser.getByteFrequencyData(dataArray);
-  for (let j = 0; j < cnst.ROW_LEN; j++) {
-    const soundIntensity = Math.floor(dataArray[j] / 20);
-    for (let i = 0; i < cnst.COL_LEN; i++) {
-      const color = getHslColor(i, soundIntensity);
-      document.getElementById(`left-${i}-${j}`).style.backgroundColor =
-        i < soundIntensity ? color : "#000";
-      document.getElementById(`right-${i}-${j}`).style.backgroundColor =
-        i < soundIntensity ? color : "#000";
-      document.getElementById(`bottom-left-${i}-${j}`).style.backgroundColor =
-        i < soundIntensity ? color : "#000";
-      document.getElementById(`bottom-right-${i}-${j}`).style.backgroundColor =
-        i < soundIntensity ? color : "#000";
-    }
-  }
-  requestAnimationFrame(updateGrids);
-};
-
 // ----- HELPER FUNCTIONS ----- //
 const togglePlaybackBtn = () => {
   if (state.isPlaying) {
@@ -531,7 +500,7 @@ const updateProgress = (progress, percent) => {
 
 // ----- APP INITIALIZATION FUNCTION ----- //
 const initializeApp = () => {
-  createGrids();
+  createScene(state.scene);
 
   togglePlaybackBtn();
   toggleVolumeBtn();
@@ -671,6 +640,180 @@ const initializeCurrSongData = () => {
   ui.currSong.poster.alt = `${songs[0].name} by ${songs[0].artist}`;
   ui.currSong.name.textContent = `${songs[0].name}`;
   ui.currSong.artist.textContent = songs[0].artist;
+};
+
+const createScene = (sceneType) => {
+  switch (sceneType) {
+    case "grid":
+      ui.scene.innerHTML = `<canvas width="100%" height="100%">`;
+      break;
+  }
+};
+
+const updateGridScene = () => {
+  const canvas = ui.scene.querySelector("canvas");
+  const ctx = canvas.getContext("2d");
+
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+
+  analyser.getByteFrequencyData(dataArray);
+
+  const halfWidth = canvas.width / 2;
+  const halfHeight = canvas.height / 2;
+
+  for (let j = 0; j < cnst.ROW_LEN + 1; j++) {
+    const soundIntensity = Math.floor(dataArray[j] / 6);
+
+    for (let i = 0; i < cnst.COL_LEN + 1; i++) {
+      const pixelHeight = halfHeight / cnst.ROW_LEN;
+      const pixelWidth = halfWidth / cnst.COL_LEN;
+
+      ctx.fillStyle = i < soundIntensity ? "#4300c0" : "#000000";
+
+      ctx.fillRect(
+        (cnst.COL_LEN - j) * pixelWidth,
+        (cnst.ROW_LEN - i) * pixelHeight,
+        pixelWidth,
+        pixelHeight
+      );
+
+      ctx.fillRect(
+        halfWidth + j * pixelWidth,
+        halfHeight + i * pixelHeight,
+        pixelWidth,
+        pixelHeight
+      );
+
+      ctx.fillRect(
+        halfWidth + j * pixelWidth,
+        (cnst.ROW_LEN - i) * pixelHeight,
+        pixelWidth,
+        pixelHeight
+      );
+
+      ctx.fillRect(
+        (cnst.COL_LEN - j) * pixelWidth,
+        halfHeight + i * pixelHeight,
+        pixelWidth,
+        pixelHeight
+      );
+    }
+  }
+
+  if (state.scene === "grid") {
+    animationRequestId = requestAnimationFrame(updateGridScene);
+  }
+};
+
+const updateBackgroundScene = () => {
+  const canvas = ui.scene.querySelector("canvas");
+  const ctx = canvas.getContext("2d");
+
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+
+  analyser.getByteFrequencyData(dataArray);
+
+  const avgIntensity =
+    dataArray.reduce((acc, val) => acc + val, 0) / dataArray.length;
+  const intensityRatio = avgIntensity / 255;
+
+  const centerColor = `rgb(
+    ${Math.floor(100 * intensityRatio)},
+    ${Math.floor(100 * intensityRatio)},
+    ${Math.floor(230 * intensityRatio)}
+  )`;
+
+  const edgeColor = "#000000";
+
+  const gradient = ctx.createRadialGradient(
+    canvas.width / 2,
+    canvas.height / 2,
+    0,
+    canvas.width / 2,
+    canvas.height / 2,
+    canvas.width / 1.2
+  );
+
+  gradient.addColorStop(0, centerColor);
+  gradient.addColorStop(1, edgeColor);
+
+  ctx.fillStyle = gradient;
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+  if (state.scene === "background") {
+    animationRequestId = requestAnimationFrame(updateBackgroundScene);
+  }
+};
+
+const updateWaveScene = () => {
+  const canvas = ui.scene.querySelector("canvas");
+  const ctx = canvas.getContext("2d");
+
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+
+  analyser.getByteFrequencyData(dataArray);
+
+  const width = canvas.width;
+  const height = canvas.height;
+  const centerY = height / 2;
+  const centerX = width / 2;
+
+  ctx.clearRect(0, 0, width, height);
+
+  ctx.strokeStyle = "#4300c0";
+  ctx.lineWidth = 5;
+
+  const drawSmoothLine = (ctx, ctrl_points) => {
+    const l = ctrl_points.length;
+    if (l < 2) return;
+
+    ctx.beginPath();
+    ctx.moveTo(ctrl_points[0].x, ctrl_points[0].y);
+
+    for (let i = 0; i < l - 1; i++) {
+      const p0 = ctrl_points[i];
+      const p1 = ctrl_points[i + 1];
+      const cp1x = p0.x + (p1.x - p0.x) * 0.5;
+      const cp1y = p0.y;
+      const cp2x = p0.x + (p1.x - p0.x) * 0.5;
+      const cp2y = p1.y;
+      ctx.bezierCurveTo(cp1x, cp1y, cp2x, cp2y, p1.x, p1.y);
+    }
+    ctx.stroke();
+  };
+
+  const generateControlPoints = (direction) => {
+    const points = [];
+    let upsideDown = false;
+
+    for (let i = 0; i < dataArray.length; i += 8) {
+      let x, y;
+      if (!upsideDown) {
+        x = centerX + direction * (i / dataArray.length) * centerX;
+        y = centerY - (dataArray[i] / 255) * centerY * 0.9;
+        upsideDown = true;
+      } else {
+        x = centerX + direction * (i / dataArray.length) * centerX;
+        y = centerY + (dataArray[i] / 255) * centerY * 0.9;
+        upsideDown = false;
+      }
+      points.push({ x, y });
+    }
+    return points;
+  };
+
+  const upperLeftControlPoints = generateControlPoints(-1, false);
+  const upperRightControlPoints = generateControlPoints(1, false);
+
+  drawSmoothLine(ctx, upperLeftControlPoints);
+  drawSmoothLine(ctx, upperRightControlPoints);
+
+  if (state.scene === "waves") {
+    animationRequestId = requestAnimationFrame(updateWaveScene);
+  }
 };
 
 // ----- INITIALIZE APP ----- //

@@ -2,58 +2,73 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link
-      rel="icon"
-      type="image/audio_visualizer/svg+xml"
-      href="audio_visualizer/svg/headphones.svg"
-    />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <!-- SEO -->
+    <!-- meta: description, keywords -->
     <meta
       name="description"
-      content="An audio visualizer built using HTML, CSS, and plain JavaScript. Web Audio API was ised to analyze audio frequencies in real-time and dynamically update a grid-based visualization based on the intensity of different frequency bands. User can upload his own audio files or select from a predefined list os songs chosen by me."
+      content="An audio visualizer built using HTML, CSS, and plain JavaScript.
+      Web Audio API was ised to analyze audio frequencies in real-time and dynamically
+      update visualization scene based on the intensity of different frequency bands.
+      User can play a song from a playlist composed by me."
     />
-    <meta
-      name="keywords"
-      content="Audio Equalizer, Web Audio API, Audio Visualizer"
-    />
+    <meta name="keywords" content="Audio Visualizer, Web Audio API" />
 
-    <meta property="og:title" content="Audio Equalizer" />
+    <!-- meta: OpenGrah title, description, image, image_url -->
+    <meta property="og:title" content="Audio Visualizer" />
     <meta
       property="og:description"
-      content="An audio visualizer built using HTML, CSS, and plain JavaScript. Web Audio API was ised to analyze audio frequencies in real-time and dynamically update a grid-based visualization based on the intensity of different frequency bands. User can upload his own audio files or select from a predefined list os songs chosen by me."
+      content="An audio visualizer built using HTML, CSS, and plain JavaScript. 
+      Web Audio API was ised to analyze audio frequencies in real-time and dynamically 
+      update visualization scene based on the intensity of different frequency bands. 
+      User can play a song from a playlist composed by me."
     />
     <meta
       property="og:image"
-      content="https://adiletbaimyrza.github.io/audio_equalizer/blob/screenshot.png"
+      content="https://adiletbaimyrza.github.io/audio_visualizer/blob/screenshot.png"
     />
     <meta
       property="og:url"
-      content="https://adiletbaimyrza.github.io/audio_equalizer/blob/screenshot.png"
+      content="https://adiletbaimyrza.github.io/audio_visualizer/blob/screenshot.png"
     />
 
+    <!-- meta: twitter card, title, description, image -->
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="Audio Equalizer" />
+    <meta name="twitter:title" content="Audio Visualizer" />
     <meta
       name="twitter:description"
-      content="An audio visualizer built using HTML, CSS, and plain JavaScript. Web Audio API was ised to analyze audio frequencies in real-time and dynamically update a grid-based visualization based on the intensity of different frequency bands. User can upload his own audio files or select from a predefined list os songs chosen by me."
+      content="An audio visualizer built using HTML, CSS, and plain JavaScript. 
+      Web Audio API was used to analyze audio frequencies in real-time and dynamically 
+      update a grid-based visualization based on the intensity of different frequency bands. 
+      User can play a song from a playlist composed by me."
     />
     <meta
       name="twitter:image"
-      content="https://adiletbaimyrza.github.io/audio_equalizer/blob/screenshot.png"
+      content="https://adiletbaimyrza.github.io/audio_visualizer/blob/screenshot.png"
     />
+
+    <!-- tab icon -->
+    <link
+      rel="icon"
+      type="image/svg+xml"
+      href="audio_visualizer/svg/headphones.svg"
+    />
+
+    <!-- title -->
     <title>Audio Equalizer</title>
+
+    <!-- CSS -->
     <link rel="stylesheet" type="text/css" href="styles.css" />
   </head>
   <body>
     <main class="main">
-      <section id="container">
-        <div class="grid-container" id="left-grid-container"></div>
-        <div class="grid-container" id="right-grid-container"></div>
-        <div class="grid-container" id="bottom-left-grid-container"></div>
-        <div class="grid-container" id="bottom-right-grid-container"></div>
-      </section>
+      <!-- visualization -->
+      <section id="container"></section>
 
+      <!-- player -->
       <section id="player" class="player">
+        <!-- current song in the player initializes in the main.js -->
         <div id="current-song">
           <img id="song-poster" src="" alt="" />
           <div>
@@ -87,7 +102,7 @@
             >
               <img
                 src="/audio_visualizer/svg/circle-pause.svg"
-                alt="play icon"
+                alt="pause icon"
               />
             </button>
             <button id="forward-btn" type="button" class="controls-btn">
@@ -131,16 +146,25 @@
         </button>
       </section>
 
+      <!-- playlist initializes in main.js -->
       <table id="playlist" class="playlist"></table>
 
       <button id="make-big-btn" type="button" title="Show playlist">
-        <img src="/audio_visualizer/svg/make-big.svg" alt="make big icon" />
+        Show Playlist
       </button>
 
       <button id="show-btn" type="button">Show player</button>
 
+      <section id="vis-change-btns">
+        <button type="button" id="canvas-rect-grid">Grid</button>
+        <button type="button" id="canvas-lines">Waves</button>
+        <button type="button" id="three-d-sphere">Flash</button>
+      </section>
+
       <audio id="audio" src="/audio_visualizer/audio/adele.mp3"></audio>
     </main>
   </body>
+
+  <!-- JavaScript -->
   <script src="main.js"></script>
 </html>
