@@ -116,9 +116,9 @@ const state = {
   setIsPlaylistHidden: (newVal) => {
     state.isPlaylistHidden = newVal;
   },
-  visualization: "grid",
-  setVisualization: (newVal) => {
-    state.visualization = newVal;
+  scene: "grid",
+  setScene: (newVal) => {
+    state.scene = newVal;
   },
 };
 
@@ -183,7 +183,7 @@ const populatePlaylist = () => {
 
   const makeSmallBtn = `
     <button id="make-small-btn" type="button" title="Hide playlist">
-      <img src="/svg/make-small.svg" alt="make small icon" />
+      Hide playlist
     </button>
   `;
 
@@ -202,17 +202,17 @@ ui.makeSmallBtn = document.getElementById("make-small-btn");
 
 /* while the audio is playing, it should be updating the scene where the audio is visualized. TODO: construct a scene changing logic */
 ui.audio.addEventListener("play", () => {
-  if (state.visualization === "grid") {
+  if (state.scene === "grid") {
     if (animationRequestId) {
       cancelAnimationFrame(animationRequestId);
     }
     updateGridScene();
-  } else if (state.visualization === "lines") {
+  } else if (state.scene === "waves") {
     if (animationRequestId) {
       cancelAnimationFrame(animationRequestId);
     }
     updateWaveScene();
-  } else if (state.visualization === "sphere") {
+  } else if (state.scene === "background") {
     if (animationRequestId) {
       cancelAnimationFrame(animationRequestId);
     }
@@ -252,22 +252,22 @@ ui.audio.addEventListener("ended", () => {
 // button event handlers
 
 ui.gridSceneBtn.addEventListener("click", () => {
-  state.setVisualization("grid");
-  console.log(state.visualization);
+  state.setScene("grid");
+  console.log(state.scene);
   ui.audio.pause();
   ui.audio.play();
 });
 
 ui.sphereSceneBtn.addEventListener("click", () => {
-  state.setVisualization("sphere");
-  console.log(state.visualization);
+  state.setScene("background");
+  console.log(state.scene);
   ui.audio.pause();
   ui.audio.play();
 });
 
 ui.linesSceneBtn.addEventListener("click", () => {
-  state.setVisualization("lines");
-  console.log(state.visualization);
+  state.setScene("waves");
+  console.log(state.scene);
   ui.audio.pause();
   ui.audio.play();
 });
@@ -277,8 +277,8 @@ ui.makeSmallBtn.addEventListener("click", () => {
   state.setIsPlaylistHidden(true);
 
   if (state.isPlayerHidden) {
-    ui.makeBigBtn.style.translate = "0 104px";
-    ui.playlist.style.translate = "0 104px";
+    ui.makeBigBtn.style.translate = "0 112px";
+    ui.playlist.style.translate = "0 112px";
   }
 
   ui.makeBigBtn.style.display = "block";
@@ -303,11 +303,11 @@ ui.hideBtn.addEventListener("click", () => {
   ui.player.style.animation = "2s hide cubic-bezier(0.19, 1, 0.22, 1) forwards";
 
   if (state.isPlaylistHidden) {
-    ui.playlist.style.translate = "0 104px";
+    ui.playlist.style.translate = "0 112px";
     ui.makeBigBtn.style.animation = `2s slideDown cubic-bezier(0.19, 1, 0.22, 1) forwards`;
   } else {
     ui.playlist.style.animation = `2s slideDown cubic-bezier(0.19, 1, 0.22, 1) forwards`;
-    ui.makeBigBtn.style.translate = "0 104px";
+    ui.makeBigBtn.style.translate = "0 112px";
   }
 });
 
@@ -450,10 +450,6 @@ ui.volumeProgress.addEventListener("mouseleave", () =>
   state.setVolumeProgMousedown(false)
 );
 
-const getHslColor = (index, soundIntensity) => {
-  return "aqua";
-};
-
 // ----- HELPER FUNCTIONS ----- //
 const togglePlaybackBtn = () => {
   if (state.isPlaying) {
@@ -504,7 +500,7 @@ const updateProgress = (progress, percent) => {
 
 // ----- APP INITIALIZATION FUNCTION ----- //
 const initializeApp = () => {
-  createScene(state.visualization);
+  createScene(state.scene);
 
   togglePlaybackBtn();
   toggleVolumeBtn();
@@ -657,23 +653,24 @@ const createScene = (sceneType) => {
 const updateGridScene = () => {
   const canvas = ui.scene.querySelector("canvas");
   const ctx = canvas.getContext("2d");
+
   canvas.width = window.innerWidth;
   canvas.height = window.innerHeight;
+
   analyser.getByteFrequencyData(dataArray);
-  const width = canvas.width / 2;
-  const height = canvas.height / 2;
+
+  const halfWidth = canvas.width / 2;
+  const halfHeight = canvas.height / 2;
 
   for (let j = 0; j < cnst.ROW_LEN + 1; j++) {
     const soundIntensity = Math.floor(dataArray[j] / 6);
 
     for (let i = 0; i < cnst.COL_LEN + 1; i++) {
-      const color = getHslColor(i, soundIntensity);
-      const pixelHeight = height / cnst.ROW_LEN;
-      const pixelWidth = width / cnst.COL_LEN;
+      const pixelHeight = halfHeight / cnst.ROW_LEN;
+      const pixelWidth = halfWidth / cnst.COL_LEN;
 
-      ctx.fillStyle = i < soundIntensity ? color : "#000";
+      ctx.fillStyle = i < soundIntensity ? "#4300c0" : "#000000";
 
-      // Top-left quadrant
       ctx.fillRect(
         (cnst.COL_LEN - j) * pixelWidth,
         (cnst.ROW_LEN - i) * pixelHeight,
@@ -681,33 +678,30 @@ const updateGridScene = () => {
         pixelHeight
       );
 
-      // Bottom-right quadrant
       ctx.fillRect(
-        width + j * pixelWidth,
-        height + i * pixelHeight,
+        halfWidth + j * pixelWidth,
+        halfHeight + i * pixelHeight,
         pixelWidth,
         pixelHeight
       );
 
-      // Top-right quadrant
       ctx.fillRect(
-        width + j * pixelWidth,
+        halfWidth + j * pixelWidth,
         (cnst.ROW_LEN - i) * pixelHeight,
         pixelWidth,
         pixelHeight
       );
 
-      // Bottom-left quadrant
       ctx.fillRect(
         (cnst.COL_LEN - j) * pixelWidth,
-        height + i * pixelHeight,
+        halfHeight + i * pixelHeight,
         pixelWidth,
         pixelHeight
       );
     }
   }
 
-  if (state.visualization === "grid") {
+  if (state.scene === "grid") {
     animationRequestId = requestAnimationFrame(updateGridScene);
   }
 };
@@ -715,47 +709,40 @@ const updateGridScene = () => {
 const updateBackgroundScene = () => {
   const canvas = ui.scene.querySelector("canvas");
   const ctx = canvas.getContext("2d");
+
   canvas.width = window.innerWidth;
   canvas.height = window.innerHeight;
 
   analyser.getByteFrequencyData(dataArray);
 
-  // Calculate the average sound intensity
   const avgIntensity =
     dataArray.reduce((acc, val) => acc + val, 0) / dataArray.length;
-  const intensityRatio = avgIntensity / 255; // Normalize the intensity (0 to 1)
+  const intensityRatio = avgIntensity / 255;
 
-  // Calculate the colors based on intensity
   const centerColor = `rgb(
     ${Math.floor(100 * intensityRatio)},
-    ${Math.floor(216 * intensityRatio)},
+    ${Math.floor(100 * intensityRatio)},
     ${Math.floor(230 * intensityRatio)}
   )`;
 
-  const edgeColor = `rgb(
-    ${Math.floor(0)},
-    ${Math.floor(0)},
-    ${Math.floor(139 * intensityRatio)}
-  )`;
+  const edgeColor = "#000000";
 
-  // Create a radial gradient
   const gradient = ctx.createRadialGradient(
     canvas.width / 2,
     canvas.height / 2,
-    0, // Inner circle
+    0,
     canvas.width / 2,
     canvas.height / 2,
-    canvas.width / 1.2 // Outer circle
+    canvas.width / 1.2
   );
 
   gradient.addColorStop(0, centerColor);
   gradient.addColorStop(1, edgeColor);
 
-  // Set the canvas background color
   ctx.fillStyle = gradient;
   ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-  if (state.visualization === "sphere") {
+  if (state.scene === "background") {
     animationRequestId = requestAnimationFrame(updateBackgroundScene);
   }
 };
@@ -776,7 +763,7 @@ const updateWaveScene = () => {
 
   ctx.clearRect(0, 0, width, height);
 
-  ctx.strokeStyle = "#00f";
+  ctx.strokeStyle = "#4300c0";
   ctx.lineWidth = 5;
 
   const drawSmoothLine = (ctx, ctrl_points) => {
@@ -801,6 +788,7 @@ const updateWaveScene = () => {
   const generateControlPoints = (direction) => {
     const points = [];
     let upsideDown = false;
+
     for (let i = 0; i < dataArray.length; i += 8) {
       let x, y;
       if (!upsideDown) {
@@ -823,7 +811,7 @@ const updateWaveScene = () => {
   drawSmoothLine(ctx, upperLeftControlPoints);
   drawSmoothLine(ctx, upperRightControlPoints);
 
-  if (state.visualization === "lines") {
+  if (state.scene === "waves") {
     animationRequestId = requestAnimationFrame(updateWaveScene);
   }
 };
