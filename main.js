@@ -451,11 +451,7 @@ ui.volumeProgress.addEventListener("mouseleave", () =>
 );
 
 const getHslColor = (index, soundIntensity) => {
-  const hue = (360 / 30) * index;
-  const saturation = "100%";
-  const lightness = 50 + (soundIntensity / 60) * 10 + "%";
-  const color = `hsl(${hue}, ${saturation}, ${lightness})`;
-  return color;
+  return "aqua";
 };
 
 // ----- HELPER FUNCTIONS ----- //
@@ -668,7 +664,7 @@ const updateCanvasRectGrid = () => {
   const height = canvas.height / 2;
 
   for (let j = 0; j < cnst.ROW_LEN + 1; j++) {
-    const soundIntensity = Math.floor(dataArray[j] / 12);
+    const soundIntensity = Math.floor(dataArray[j] / 6);
 
     for (let i = 0; i < cnst.COL_LEN + 1; i++) {
       const color = getHslColor(i, soundIntensity);
@@ -731,7 +727,7 @@ const updateBackground = () => {
 
   // Calculate the colors based on intensity
   const centerColor = `rgb(
-    ${Math.floor(173 * intensityRatio)},
+    ${Math.floor(100 * intensityRatio)},
     ${Math.floor(216 * intensityRatio)},
     ${Math.floor(230 * intensityRatio)}
   )`;
@@ -749,7 +745,7 @@ const updateBackground = () => {
     0, // Inner circle
     canvas.width / 2,
     canvas.height / 2,
-    canvas.width / 2 // Outer circle
+    canvas.width / 1.2 // Outer circle
   );
 
   gradient.addColorStop(0, centerColor);
@@ -778,32 +774,55 @@ const updateLinesScene = () => {
   const centerY = height / 2;
   const centerX = width / 2;
 
-  ctx.clearRect(0, 0, width, height); // Clear the canvas
+  ctx.clearRect(0, 0, width, height);
 
-  ctx.beginPath();
+  ctx.strokeStyle = "#00f";
+  ctx.lineWidth = 5;
 
-  // Draw the wave
-  for (let i = dataArray.length - 1; i > -1; i--) {
-    const x = centerX - (i / dataArray.length) * centerX;
-    const y = centerY - (dataArray[i] / 255) * centerY; // Normalize the data to fit the canvas height
+  const drawSmoothLine = (ctx, ctrl_points) => {
+    const l = ctrl_points.length;
+    if (l < 2) return;
 
-    if (!(x === 0 || y === 0)) {
-      ctx.lineTo(x, y);
+    ctx.beginPath();
+    ctx.moveTo(ctrl_points[0].x, ctrl_points[0].y);
+
+    for (let i = 0; i < l - 1; i++) {
+      const p0 = ctrl_points[i];
+      const p1 = ctrl_points[i + 1];
+      const cp1x = p0.x + (p1.x - p0.x) * 0.5;
+      const cp1y = p0.y;
+      const cp2x = p0.x + (p1.x - p0.x) * 0.5;
+      const cp2y = p1.y;
+      ctx.bezierCurveTo(cp1x, cp1y, cp2x, cp2y, p1.x, p1.y);
     }
-  }
+    ctx.stroke();
+  };
 
-  for (let i = 0; i < dataArray.length; i++) {
-    const x = centerX + (i / dataArray.length) * centerX;
-    const y = centerY - (dataArray[i] / 255) * centerY; // Normalize the data to fit the canvas height
-
-    if (!(x === 0 || y === 0)) {
-      ctx.lineTo(x, y);
+  const generateControlPoints = (direction, upsideDown) => {
+    const points = [];
+    for (let i = 0; i < dataArray.length; i += 8) {
+      let x, y;
+      if (!upsideDown) {
+        x = centerX + direction * (i / dataArray.length) * centerX;
+        y = centerY - (dataArray[i] / 255) * centerY * 0.9;
+      } else {
+        x = centerX + direction * (i / dataArray.length) * centerX;
+        y = centerY + (dataArray[i] / 255) * centerY * 0.9;
+      }
+      points.push({ x, y });
     }
-  }
+    return points;
+  };
 
-  ctx.strokeStyle = "#00f"; // Set the stroke color for the wave
-  ctx.lineWidth = 10; // Set the line width for the wave
-  ctx.stroke();
+  const upperLeftControlPoints = generateControlPoints(-1, false);
+  const upperRightControlPoints = generateControlPoints(1, false);
+  const lowerLeftControlPoints = generateControlPoints(-1, true);
+  const lowerRightControlPoints = generateControlPoints(1, true);
+
+  drawSmoothLine(ctx, upperLeftControlPoints);
+  drawSmoothLine(ctx, upperRightControlPoints);
+  drawSmoothLine(ctx, lowerLeftControlPoints);
+  drawSmoothLine(ctx, lowerRightControlPoints);
 
   if (state.visualization === "lines") {
     animationRequestId = requestAnimationFrame(updateLinesScene);
