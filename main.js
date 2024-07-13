@@ -48,6 +48,7 @@ const ui = {
   backwardBtn: document.getElementById("backward-btn"),
   volumeHighBtn: document.getElementById("volume-high-btn"),
   makeBigBtn: document.getElementById("make-big-btn"),
+  makeSmallBtn: document.getElementById("make-small-btn"),
   mutedBtn: document.getElementById("muted-btn"),
   hideBtn: document.getElementById("hide-btn"),
   showBtn: document.getElementById("show-btn"),
@@ -187,20 +188,13 @@ const populatePlaylist = () => {
 
   tbody += "</tbody>";
 
-  const makeSmallBtn = `
-    <button id="make-small-btn" type="button" title="Hide playlist">
-      Hide playlist
-    </button>
-  `;
-
-  playlistInnerHtml = thead + tbody + makeSmallBtn;
+  playlistInnerHtml = thead + tbody;
 
   ui.playlist.innerHTML = playlistInnerHtml;
 };
 
 // ----- POPULATE PLAYLIST TABLE ----- //
 populatePlaylist();
-ui.makeSmallBtn = document.getElementById("make-small-btn");
 
 /* ----- EVENT HANDLERS ----- */
 
@@ -273,10 +267,10 @@ ui.forwardStepBtn.addEventListener("click", () => {
 
   document
     .getElementById(`${nextSong.path}-playlist-song`)
-    .querySelector(".util-btn-cell").style.color = "var(--yellow)";
+    .querySelector(".util-btn-cell").style.color = "var(--now-playing)";
   document
     .getElementById(`${nextSong.path}-playlist-song`)
-    .querySelector("h3").style.color = "var(--yellow)";
+    .querySelector("h3").style.color = "var(--now-playing)";
 
   if (state.isPlaying && state.currSong === nextSong) {
     state.setIsPlaying(false);
@@ -354,10 +348,10 @@ ui.backwardStepBtn.addEventListener("click", () => {
 
   document
     .getElementById(`${prevSong.path}-playlist-song`)
-    .querySelector(".util-btn-cell").style.color = "var(--yellow)";
+    .querySelector(".util-btn-cell").style.color = "var(--now-playing)";
   document
     .getElementById(`${prevSong.path}-playlist-song`)
-    .querySelector("h3").style.color = "var(--yellow)";
+    .querySelector("h3").style.color = "var(--now-playing)";
 
   if (state.isPlaying && state.currSong === prevSong) {
     state.setIsPlaying(false);
@@ -446,17 +440,24 @@ ui.makeSmallBtn.addEventListener("click", () => {
 
   if (state.isPlayerHidden) {
     ui.makeBigBtn.style.translate = "0 112px";
+    ui.makeSmallBtn.style.translate = "0 112px";
     ui.playlist.style.translate = "0 112px";
   }
 
+  ui.makeSmallBtn.style.display = "none";
   ui.makeBigBtn.style.display = "block";
   ui.makeBigBtn.style.animation = undefined;
+  ui.makeSmallBtn.style.animation = undefined;
   ui.playlist.style.animation =
     "getSmall 0.3s cubic-bezier(0.19, 1, 0.22, 1) forwards";
 });
 
 ui.makeBigBtn.addEventListener("click", () => {
   state.setIsPlaylistHidden(false);
+
+  setTimeout(() => {
+    ui.makeSmallBtn.style.display = "block";
+  }, 90);
 
   ui.playlist.style.animation =
     "getBig 0.3s cubic-bezier(0.19, 1, 0.22, 1) forwards";
@@ -467,14 +468,18 @@ ui.hideBtn.addEventListener("click", () => {
   state.setIsPlayerHidden(true);
 
   ui.showBtn.style.display = "block";
+  ui.hideBtn.style.display = "none";
 
   ui.player.style.animation = "2s hide cubic-bezier(0.19, 1, 0.22, 1) forwards";
+  ui.showBtn.style.animation = `2s slideDown cubic-bezier(0.19, 1, 0.22, 1) forwards`;
 
   if (state.isPlaylistHidden) {
     ui.playlist.style.translate = "0 112px";
+    ui.makeSmallBtn.style.translate = "0 112px";
     ui.makeBigBtn.style.animation = `2s slideDown cubic-bezier(0.19, 1, 0.22, 1) forwards`;
   } else {
     ui.playlist.style.animation = `2s slideDown cubic-bezier(0.19, 1, 0.22, 1) forwards`;
+    ui.makeSmallBtn.style.animation = `2s slideDown cubic-bezier(0.19, 1, 0.22, 1) forwards`;
     ui.makeBigBtn.style.translate = "0 112px";
   }
 });
@@ -483,16 +488,23 @@ ui.showBtn.addEventListener("click", () => {
   state.setIsPlayerHidden(false);
 
   ui.showBtn.style.display = "none";
+  ui.hideBtn.style.display = "block";
 
   ui.player.style.animation = "2s show cubic-bezier(0.19, 1, 0.22, 1) forwards";
+
+  ui.hideBtn.style.translate = "0";
+  ui.hideBtn.style.animation = `2s slideUp cubic-bezier(0.19, 1, 0.22, 1) forwards`;
 
   if (state.isPlaylistHidden) {
     ui.makeBigBtn.style.translate = "0";
     ui.makeBigBtn.style.animation = `2s slideUp cubic-bezier(0.19, 1, 0.22, 1) forwards`;
     ui.playlist.style.translate = "0";
+    ui.makeSmallBtn.style.translate = "0";
   } else {
     ui.playlist.style.translate = "0";
     ui.playlist.style.animation = `2s slideUp cubic-bezier(0.19, 1, 0.22, 1) forwards`;
+    ui.makeSmallBtn.style.translate = "0";
+    ui.makeSmallBtn.style.animation = `2s slideUp cubic-bezier(0.19, 1, 0.22, 1) forwards`;
     ui.makeBigBtn.style.translate = "0";
   }
 });
@@ -524,10 +536,10 @@ ui.playBtn.addEventListener("click", () => {
 
   document
     .getElementById(`${state.currSong.path}-playlist-song`)
-    .querySelector(".util-btn-cell").style.color = "var(--yellow)";
+    .querySelector(".util-btn-cell").style.color = "var(--now-playing)";
   document
     .getElementById(`${state.currSong.path}-playlist-song`)
-    .querySelector("h3").style.color = "var(--yellow)";
+    .querySelector("h3").style.color = "var(--now-playing)";
 });
 
 ui.pauseBtn.addEventListener("click", () => {
@@ -677,7 +689,7 @@ const initializeApp = () => {
     updateDurations();
   });
 
-  updateProgress(ui.volumeProgress, ui.audio.volume * 100);
+  updateProgress(ui.volumeProgress, ui.audio.volume * 60);
 
   initializeCurrSongData();
 };
@@ -697,10 +709,10 @@ songs.forEach((song) => {
       });
       document
         .getElementById(`${song.path}-playlist-song`)
-        .querySelector(".util-btn-cell").style.color = "var(--yellow)";
+        .querySelector(".util-btn-cell").style.color = "var(--now-playing)";
       document
         .getElementById(`${song.path}-playlist-song`)
-        .querySelector("h3").style.color = "var(--yellow)";
+        .querySelector("h3").style.color = "var(--now-playing)";
 
       if (state.isPlaying && state.currSong === song) {
         state.setIsPlaying(false);
@@ -802,6 +814,14 @@ songs.forEach((song) => {
       }
     });
 });
+
+function toggleFullScreen() {
+  if (!document.fullscreenElement) {
+    document.documentElement.requestFullscreen();
+  } else if (document.exitFullscreen) {
+    document.exitFullscreen();
+  }
+}
 
 const initializeCurrSongData = () => {
   ui.currSong.poster.src = `/posters/${songs[0].path}.webp`;

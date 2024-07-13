@@ -14,13 +14,14 @@ button {
 :root {
   --black: #1f1829;
   --lighter-black: #2e243d;
-  --white: #ffffff;
+  --white: #f0ead6;
   --grey: #808080;
-  --yellow: #e8d940;
+  --now-playing: #de3163;
   --scene-bg: #000000;
   --scene-color: #4300c0;
-  --card-bg: #0e0e37;
-  --card-btn-bg: #1a085a;
+  --card-bg: #181818;
+  --card-btn-bg: #222222;
+  --border: #222222;
 }
 
 /* ----- GLOBAL FONTS ----- */
@@ -41,6 +42,7 @@ body {
   position: absolute;
   bottom: 0;
   display: grid;
+  border: 1px solid var(--border);
   grid-template-columns: repeat(12, 1fr);
   background-color: var(--card-bg);
   color: var(--white);
@@ -152,36 +154,15 @@ body {
       max-width: 150px;
     }
   }
-
-  #hide-btn {
-    border-radius: 2px;
-    cursor: pointer;
-    color: var(--white);
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    display: flex;
-    align-items: center;
-    padding: 5px;
-    background-color: var(--card-btn-bg);
-
-    img {
-      width: 10px;
-      height: 10px;
-    }
-  }
-
-  #hide-btn:hover {
-    opacity: 0.6;
-  }
 }
 
 /* ----- PLAYLIST ----- */
 .playlist {
+  border: 1px solid var(--border);
   font-size: 0.9rem;
   position: absolute;
   left: 10px;
-  bottom: 120px;
+  bottom: 125px;
   display: flex;
   flex-direction: column;
   border-radius: 10px;
@@ -265,7 +246,7 @@ body {
       span {
         width: 3px;
         height: 100%;
-        background-color: var(--yellow);
+        background-color: var(--now-playing);
         border-radius: 3px;
         transform-origin: bottom;
         animation: bounce 2.2s ease infinite alternate;
@@ -289,54 +270,47 @@ body {
 
   .playlist-song:hover {
     background-color: var(--card-btn-bg);
-  }
-
-  #make-small-btn {
-    position: absolute;
-    color: #c7c7c7;
-    right: 10px;
-    top: 10px;
-    display: none;
     cursor: pointer;
-    opacity: 0.5;
-    img {
-      width: 15px;
-      height: 15px;
-    }
   }
-
-  #make-small-btn:hover {
-    opacity: 1;
-  }
-}
-
-.playlist:hover #make-small-btn {
-  display: block;
-}
-
-#show-btn {
-  display: none;
-  position: absolute;
-  border-radius: 2px;
-  color: var(--white);
-  padding: 5px;
-  background-color: var(--card-btn-bg);
 }
 
 #make-big-btn {
-  color: var(--white);
   position: absolute;
   display: none;
-  background-color: var(--card-bg);
-  padding: 8px 10px 7px 10px;
-  border-radius: 5px;
   left: 10px;
-  bottom: 120px;
-  cursor: pointer;
+  bottom: 125px;
+  font-weight: bold;
+  font-size: medium;
+  letter-spacing: 1px;
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  color: var(--white);
+  padding: 10px;
+  background-color: var(--card-bg);
 }
 
 #make-big-btn:hover {
-  opacity: 0.8;
+  cursor: pointer;
+  background-color: var(--card-btn-bg);
+}
+
+#make-small-btn {
+  position: absolute;
+  bottom: 515px;
+  left: 362px;
+  font-weight: bold;
+  font-size: medium;
+  letter-spacing: 1px;
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  color: var(--white);
+  padding: 10px;
+  background-color: var(--card-bg);
+}
+
+#make-small-btn:hover {
+  cursor: pointer;
+  background-color: var(--card-btn-bg);
 }
 
 .main {
@@ -350,7 +324,7 @@ body {
   display: flex;
   position: relative;
   height: 6px;
-  background: var(--grey);
+  background: var(--border);
   border-radius: 25px;
   margin: 0 5px;
   flex: 10;
@@ -360,7 +334,7 @@ body {
 
 .progress-filled {
   height: 6px;
-  background: var(--white);
+  background: var(--now-playing);
   flex: 0;
   flex-basis: 0%;
   border-radius: 25px;
@@ -428,16 +402,51 @@ body {
 #vis-change-btns {
   display: flex;
   position: absolute;
-  right: 0;
-  top: 0;
+  right: 10px;
+  top: 10px;
 
   button {
-    border-radius: 2px;
-    margin-left: 5px;
+    font-weight: bold;
+    font-size: medium;
+    letter-spacing: 1px;
+    border: 1px solid var(--border);
+    margin-left: 10px;
+    border-radius: 5px;
     color: var(--white);
-    padding: 5px;
+    padding: 10px;
+    background-color: var(--card-bg);
+  }
+
+  button:hover {
+    cursor: pointer;
     background-color: var(--card-btn-bg);
   }
+}
+
+#show-btn,
+#hide-btn {
+  position: absolute;
+  bottom: 125px;
+  right: 10px;
+  font-weight: bold;
+  font-size: medium;
+  letter-spacing: 1px;
+  border: 1px solid var(--border);
+  margin-left: 10px;
+  border-radius: 5px;
+  color: var(--white);
+  padding: 10px;
+  background-color: var(--card-bg);
+}
+
+#show-btn:hover,
+#hide-btn:hover {
+  cursor: pointer;
+  background-color: var(--card-btn-bg);
+}
+
+#show-btn {
+  display: none;
 }
 
 @keyframes bounce {
