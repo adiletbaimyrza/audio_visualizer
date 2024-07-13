@@ -934,7 +934,7 @@ const updateBackgroundScene = () => {
     0,
     canvas.width / 2,
     canvas.height / 2,
-    canvas.width / 1
+    canvas.width / 1.5
   );
 
   gradient.addColorStop(0, centerColor);
@@ -1048,14 +1048,14 @@ const updateWaveScene = () => {
     ctx.strokeStyle = gradient;
 
     ctx.shadowColor = shadowColor;
-    ctx.shadowBlur = 5;
+    ctx.shadowBlur = 2;
     ctx.lineWidth = lineWidth;
 
     drawSmoothLine(ctx, leftControlPoints);
     drawSmoothLine(ctx, rightControlPoints);
   };
 
-  drawWave(1, 0, 0.7, 1, 0, 2, "rgba(255, 255, 255, 0.5)");
+  drawWave(1, 0, 0.7, 1, 0, 1, "rgba(255, 255, 255, 0.5)");
 
   if (state.scene === "waves") {
     animationRequestId = requestAnimationFrame(updateWaveScene);
