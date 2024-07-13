@@ -857,30 +857,39 @@ const updateGridScene = () => {
       const pixelHeight = halfHeight / cnst.ROW_LEN;
       const pixelWidth = halfWidth / cnst.COL_LEN;
 
-      ctx.fillStyle = i < soundIntensity ? "#4300c0" : "#000000";
+      const baseHue = (Date.now() / 15) % 360;
+      const scaleFactor = 3;
+      const hue =
+        (baseHue +
+          ((i / (cnst.COL_LEN * scaleFactor)) * 360 +
+            (j / (cnst.ROW_LEN * scaleFactor)) * 360)) %
+        360;
 
-      ctx.fillRect(
+      const saturation = 70 + ((i + j) % 30);
+
+      ctx.strokeStyle =
+        i < soundIntensity ? `hsl(${hue}, ${saturation}%, 50%)` : "#000000";
+      ctx.lineWidth = 1;
+
+      ctx.strokeRect(
         (cnst.COL_LEN - j) * pixelWidth,
         (cnst.ROW_LEN - i) * pixelHeight,
         pixelWidth,
         pixelHeight
       );
-
-      ctx.fillRect(
+      ctx.strokeRect(
         halfWidth + j * pixelWidth,
         halfHeight + i * pixelHeight,
         pixelWidth,
         pixelHeight
       );
-
-      ctx.fillRect(
+      ctx.strokeRect(
         halfWidth + j * pixelWidth,
         (cnst.ROW_LEN - i) * pixelHeight,
         pixelWidth,
         pixelHeight
       );
-
-      ctx.fillRect(
+      ctx.strokeRect(
         (cnst.COL_LEN - j) * pixelWidth,
         halfHeight + i * pixelHeight,
         pixelWidth,
