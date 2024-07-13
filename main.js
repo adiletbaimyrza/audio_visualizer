@@ -916,11 +916,15 @@ const updateBackgroundScene = () => {
     dataArray.reduce((acc, val) => acc + val, 0) / dataArray.length;
   const intensityRatio = avgIntensity / 255;
 
-  const centerColor = `rgb(
-    ${Math.floor(100 * intensityRatio)},
-    ${Math.floor(100 * intensityRatio)},
-    ${Math.floor(230 * intensityRatio)}
-  )`;
+  const baseHue = (Date.now() / 30) % 360;
+  const hue = (baseHue + 2) % 360;
+
+  const saturation = 100;
+  const lightness = 50 * intensityRatio;
+
+  const centerColor = `hsl(${Math.floor(hue)}, ${saturation}%, ${Math.floor(
+    lightness
+  )}%)`;
 
   const edgeColor = "#000000";
 
@@ -930,7 +934,7 @@ const updateBackgroundScene = () => {
     0,
     canvas.width / 2,
     canvas.height / 2,
-    canvas.width / 1.2
+    canvas.width / 1
   );
 
   gradient.addColorStop(0, centerColor);
@@ -960,8 +964,35 @@ const updateWaveScene = () => {
 
   ctx.clearRect(0, 0, width, height);
 
-  ctx.strokeStyle = "#4300c0";
-  ctx.lineWidth = 5;
+  const generateControlPoints = (
+    direction,
+    offset,
+    amplitudeFactor,
+    frequency
+  ) => {
+    const points = [];
+    let upsideDown = false;
+    const incrementStep = 1;
+    const amplitudeThreshold = 10;
+
+    for (let i = 0; i < dataArray.length; i += incrementStep) {
+      const amplitude = (dataArray[i] / 255) * centerY * amplitudeFactor;
+      if (amplitude < amplitudeThreshold) continue;
+
+      let x, y;
+      if (!upsideDown) {
+        x = centerX + direction * (i / dataArray.length) * centerX;
+        y = centerY - amplitude + offset;
+        upsideDown = true;
+      } else {
+        x = centerX + direction * (i / dataArray.length) * centerX;
+        y = centerY + amplitude + offset;
+        upsideDown = false;
+      }
+      points.push({ x, y });
+    }
+    return points;
+  };
 
   const drawSmoothLine = (ctx, ctrl_points) => {
     const l = ctrl_points.length;
@@ -982,34 +1013,54 @@ const updateWaveScene = () => {
     ctx.stroke();
   };
 
-  const generateControlPoints = (direction) => {
-    const points = [];
-    let upsideDown = false;
+  const drawWave = (
+    direction,
+    offset,
+    amplitudeFactor,
+    frequency,
+    colorOffset,
+    lineWidth,
+    shadowColor
+  ) => {
+    const leftControlPoints = generateControlPoints(
+      direction,
+      offset,
+      amplitudeFactor,
+      frequency
+    );
+    const rightControlPoints = generateControlPoints(
+      -direction,
+      offset,
+      amplitudeFactor,
+      frequency
+    );
 
-    for (let i = 0; i < dataArray.length; i += 8) {
-      let x, y;
-      if (!upsideDown) {
-        x = centerX + direction * (i / dataArray.length) * centerX;
-        y = centerY - (dataArray[i] / 255) * centerY * 0.9;
-        upsideDown = true;
-      } else {
-        x = centerX + direction * (i / dataArray.length) * centerX;
-        y = centerY + (dataArray[i] / 255) * centerY * 0.9;
-        upsideDown = false;
-      }
-      points.push({ x, y });
-    }
-    return points;
+    const baseHue = (Date.now() / 15) % 360;
+    const hue = (baseHue + colorOffset) % 360;
+    const gradient = ctx.createLinearGradient(
+      0,
+      0,
+      canvas.width,
+      canvas.height
+    );
+    gradient.addColorStop(0, `hsl(${hue}, 100%, 50%)`);
+    gradient.addColorStop(1, `hsl(${(hue + 120) % 360}, 100%, 50%)`);
+    ctx.strokeStyle = gradient;
+
+    ctx.shadowColor = shadowColor;
+    ctx.shadowBlur = 5;
+    ctx.lineWidth = lineWidth;
+
+    drawSmoothLine(ctx, leftControlPoints);
+    drawSmoothLine(ctx, rightControlPoints);
   };
 
-  const upperLeftControlPoints = generateControlPoints(-1, false);
-  const upperRightControlPoints = generateControlPoints(1, false);
-
-  drawSmoothLine(ctx, upperLeftControlPoints);
-  drawSmoothLine(ctx, upperRightControlPoints);
+  drawWave(1, 0, 0.7, 1, 0, 2, "rgba(255, 255, 255, 0.5)");
 
   if (state.scene === "waves") {
     animationRequestId = requestAnimationFrame(updateWaveScene);
+  } else {
+    cancelAnimationFrame(animationRequestId);
   }
 };
 
