@@ -146,7 +146,7 @@ const populatePlaylist = () => {
         <th class="util-btn-cell">#</th>
         <th class="poster-cell">Title</th>
         <th class="title-cell"></th>
-        <th title="Duration" class="duration-cell"><img src="/audio_visualizer/svg/clock.svg" alt="clock icon"/></th>
+        <th title="Duration" class="duration-cell"><img src="/svg/clock.svg" alt="clock icon"/></th>
       </tr>
     </thead>
   `;
@@ -158,8 +158,8 @@ const populatePlaylist = () => {
     <tr id="${song.path}-playlist-song" class="playlist-song">
       <td class="util-btn-cell">
         <p>${songs.indexOf(song) + 1}</p>
-        <img class="playlist-play-btn" src="/audio_visualizer/svg/play.svg" alt="play icon" />
-        <img class="playlist-pause-btn" src="/audio_visualizer/svg/pause.svg" alt="pause icon" />
+        <img class="playlist-play-btn" src="/svg/play.svg" alt="play icon" />
+        <img class="playlist-pause-btn" src="/svg/pause.svg" alt="pause icon" />
         <div class="now-playing">
           <span></span>
           <span></span>
@@ -168,9 +168,9 @@ const populatePlaylist = () => {
       </td>
 
       <td class="poster-cell">
-        <img src="/audio_visualizer/posters/${song.path}.webp" alt="${
-      song.name
-    } by ${song.artist}" />
+        <img src="/posters/${song.path}.webp" alt="${song.name} by ${
+      song.artist
+    }" />
       </td>
 
       <td class="title-cell">
@@ -295,7 +295,7 @@ ui.forwardStepBtn.addEventListener("click", () => {
       .getElementById(`${nextSong.path}-playlist-song`)
       .querySelector("p").style.display = "block";
   } else {
-    ui.audio.src = `/audio_visualizer/audio/${nextSong.path}.mp3`;
+    ui.audio.src = `/audio/${nextSong.path}.mp3`;
 
     if (audioCtx.state === "suspended") audioCtx.resume();
 
@@ -304,7 +304,7 @@ ui.forwardStepBtn.addEventListener("click", () => {
 
     ui.audio.play();
 
-    ui.currSong.poster.src = `/audio_visualizer/posters/${nextSong.path}.webp`;
+    ui.currSong.poster.src = `/posters/${nextSong.path}.webp`;
     ui.currSong.poster.alt = `${nextSong.name} by ${nextSong.artist}`;
     ui.currSong.name.textContent = nextSong.name;
     ui.currSong.artist.textContent = nextSong.artist;
@@ -376,7 +376,7 @@ ui.backwardStepBtn.addEventListener("click", () => {
       .getElementById(`${prevSong.path}-playlist-song`)
       .querySelector("p").style.display = "block";
   } else {
-    ui.audio.src = `/audio_visualizer/audio/${prevSong.path}.mp3`;
+    ui.audio.src = `/audio/${prevSong.path}.mp3`;
 
     if (audioCtx.state === "suspended") audioCtx.resume();
 
@@ -385,7 +385,7 @@ ui.backwardStepBtn.addEventListener("click", () => {
 
     ui.audio.play();
 
-    ui.currSong.poster.src = `/audio_visualizer/posters/${prevSong.path}.webp`;
+    ui.currSong.poster.src = `/posters/${prevSong.path}.webp`;
     ui.currSong.poster.alt = `${prevSong.name} by ${prevSong.artist}`;
     ui.currSong.name.textContent = prevSong.name;
     ui.currSong.artist.textContent = prevSong.artist;
@@ -719,7 +719,7 @@ songs.forEach((song) => {
           .getElementById(`${song.path}-playlist-song`)
           .querySelector("p").style.display = "block";
       } else {
-        ui.audio.src = `/audio_visualizer/audio/${song.path}.mp3`;
+        ui.audio.src = `/audio/${song.path}.mp3`;
 
         if (audioCtx.state === "suspended") audioCtx.resume();
 
@@ -728,7 +728,7 @@ songs.forEach((song) => {
 
         ui.audio.play();
 
-        ui.currSong.poster.src = `/audio_visualizer/posters/${song.path}.webp`;
+        ui.currSong.poster.src = `/posters/${song.path}.webp`;
         ui.currSong.poster.alt = `${song.name} by ${song.artist}`;
         ui.currSong.name.textContent = song.name;
         ui.currSong.artist.textContent = song.artist;
@@ -804,7 +804,7 @@ songs.forEach((song) => {
 });
 
 const initializeCurrSongData = () => {
-  ui.currSong.poster.src = `/audio_visualizer/posters/${songs[0].path}.webp`;
+  ui.currSong.poster.src = `/posters/${songs[0].path}.webp`;
   ui.currSong.poster.alt = `${songs[0].name} by ${songs[0].artist}`;
   ui.currSong.name.textContent = `${songs[0].name}`;
   ui.currSong.artist.textContent = songs[0].artist;
