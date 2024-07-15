@@ -54,6 +54,8 @@ const ui = {
   showBtn: document.getElementById("show-btn"),
   forwardStepBtn: document.getElementById("forward-step-btn"),
   backwardStepBtn: document.getElementById("backward-step-btn"),
+  fullScreenBtn: document.getElementById("full-screen-btn"),
+  microphoneBtn: document.getElementById("microphone-btn"),
   // scene change buttons
   gridSceneBtn: document.getElementById("canvas-rect-grid"),
   linesSceneBtn: document.getElementById("canvas-lines"),
@@ -83,6 +85,10 @@ ui.currSong.artist = ui.currSong.querySelector("#song-artist");
 // ----- STATES AND SETTERS ----- //
 // initialize states with default values
 const state = {
+  isLive: false,
+  setIsLive: (newVal) => {
+    state.isLive = newVal;
+  },
   isPlaying: false,
   setIsPlaying: (newVal) => {
     state.isPlaying = newVal;
@@ -131,10 +137,10 @@ const state = {
 
 // ----- INITIALIZE AUDIO CONTEXT, ANALYSER, AND DATA_ARRAY ----- //
 
-const audioCtx = new window.AudioContext();
+let audioCtx = new window.AudioContext();
 
-const audioSource = audioCtx.createMediaElementSource(ui.audio);
-const analyser = audioCtx.createAnalyser();
+let audioSource = audioCtx.createMediaElementSource(ui.audio);
+let analyser = audioCtx.createAnalyser();
 analyser.fftSize = cnst.FFT_SIZE;
 const dataArray = new Uint8Array(analyser.frequencyBinCount);
 
@@ -584,6 +590,58 @@ ui.mutedBtn.addEventListener("click", () => {
 
   toggleVolumeBtn();
 });
+
+const handleMicrophone = () => {
+  if (!audioCtx) {
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  }
+
+  if (!analyser) {
+    analyser = audioCtx.createAnalyser();
+  }
+
+  if (state.isLive) {
+    if (audioCtx.state === "suspended") audioCtx.resume();
+
+    audioSource.connect(analyser);
+
+    ui.playlist.style.display = "flex";
+    ui.player.style.display = "flex";
+    ui.hideBtn.style.display = "block";
+    ui.makeSmallBtn.style.display = "block";
+    ui.showBtn.style.display = "none";
+
+    state.setIsLive(false);
+  } else {
+    navigator.mediaDevices
+      .getUserMedia({ audio: true })
+      .then((stream) => {
+        audioSource = audioCtx.createMediaStreamSource(stream);
+        audioSource.connect(analyser);
+
+        if (audioCtx.state === "suspended") audioCtx.resume();
+
+        ui.playlist.style.display = "none";
+        ui.player.style.display = "none";
+        ui.hideBtn.style.display = "none";
+        ui.showBtn.style.display = "none";
+        ui.makeBigBtn.style.display = "none";
+        ui.makeSmallBtn.style.display = "none";
+
+        state.setScene("grid");
+        console.log(state.scene);
+        ui.audio.pause();
+        ui.audio.play();
+        state.setIsLive(true);
+      })
+      .catch((err) => {
+        console.error("Error accessing the microphone: ", err);
+      });
+  }
+};
+
+ui.fullScreenBtn.addEventListener("click", toggleFullScreen);
+ui.microphoneBtn.addEventListener("click", handleMicrophone);
 
 // progress bar event handlers
 const songScrub = (event) => {
