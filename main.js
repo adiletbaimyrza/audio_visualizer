@@ -48,11 +48,14 @@ const ui = {
   backwardBtn: document.getElementById("backward-btn"),
   volumeHighBtn: document.getElementById("volume-high-btn"),
   makeBigBtn: document.getElementById("make-big-btn"),
+  makeSmallBtn: document.getElementById("make-small-btn"),
   mutedBtn: document.getElementById("muted-btn"),
   hideBtn: document.getElementById("hide-btn"),
   showBtn: document.getElementById("show-btn"),
   forwardStepBtn: document.getElementById("forward-step-btn"),
   backwardStepBtn: document.getElementById("backward-step-btn"),
+  fullScreenBtn: document.getElementById("full-screen-btn"),
+  microphoneBtn: document.getElementById("microphone-btn"),
   // scene change buttons
   gridSceneBtn: document.getElementById("canvas-rect-grid"),
   linesSceneBtn: document.getElementById("canvas-lines"),
@@ -82,6 +85,10 @@ ui.currSong.artist = ui.currSong.querySelector("#song-artist");
 // ----- STATES AND SETTERS ----- //
 // initialize states with default values
 const state = {
+  isLive: false,
+  setIsLive: (newVal) => {
+    state.isLive = newVal;
+  },
   isPlaying: false,
   setIsPlaying: (newVal) => {
     state.isPlaying = newVal;
@@ -130,10 +137,10 @@ const state = {
 
 // ----- INITIALIZE AUDIO CONTEXT, ANALYSER, AND DATA_ARRAY ----- //
 
-const audioCtx = new window.AudioContext();
+let audioCtx = new window.AudioContext();
 
-const audioSource = audioCtx.createMediaElementSource(ui.audio);
-const analyser = audioCtx.createAnalyser();
+let audioSource = audioCtx.createMediaElementSource(ui.audio);
+let analyser = audioCtx.createAnalyser();
 analyser.fftSize = cnst.FFT_SIZE;
 const dataArray = new Uint8Array(analyser.frequencyBinCount);
 
@@ -146,7 +153,7 @@ const populatePlaylist = () => {
         <th class="util-btn-cell">#</th>
         <th class="poster-cell">Title</th>
         <th class="title-cell"></th>
-        <th title="Duration" class="duration-cell"><img src="/audio_visualizer/svg/clock.svg" alt="clock icon"/></th>
+        <th title="Duration" class="duration-cell"><img src="/svg/clock.svg" alt="clock icon"/></th>
       </tr>
     </thead>
   `;
@@ -158,8 +165,8 @@ const populatePlaylist = () => {
     <tr id="${song.path}-playlist-song" class="playlist-song">
       <td class="util-btn-cell">
         <p>${songs.indexOf(song) + 1}</p>
-        <img class="playlist-play-btn" src="/audio_visualizer/svg/play.svg" alt="play icon" />
-        <img class="playlist-pause-btn" src="/audio_visualizer/svg/pause.svg" alt="pause icon" />
+        <img class="playlist-play-btn" src="/svg/play.svg" alt="play icon" />
+        <img class="playlist-pause-btn" src="/svg/pause.svg" alt="pause icon" />
         <div class="now-playing">
           <span></span>
           <span></span>
@@ -168,9 +175,9 @@ const populatePlaylist = () => {
       </td>
 
       <td class="poster-cell">
-        <img src="/audio_visualizer/posters/${song.path}.webp" alt="${
-      song.name
-    } by ${song.artist}" />
+        <img src="/posters/${song.path}.webp" alt="${song.name} by ${
+      song.artist
+    }" />
       </td>
 
       <td class="title-cell">
@@ -187,20 +194,13 @@ const populatePlaylist = () => {
 
   tbody += "</tbody>";
 
-  const makeSmallBtn = `
-    <button id="make-small-btn" type="button" title="Hide playlist">
-      Hide playlist
-    </button>
-  `;
-
-  playlistInnerHtml = thead + tbody + makeSmallBtn;
+  playlistInnerHtml = thead + tbody;
 
   ui.playlist.innerHTML = playlistInnerHtml;
 };
 
 // ----- POPULATE PLAYLIST TABLE ----- //
 populatePlaylist();
-ui.makeSmallBtn = document.getElementById("make-small-btn");
 
 /* ----- EVENT HANDLERS ----- */
 
@@ -273,10 +273,10 @@ ui.forwardStepBtn.addEventListener("click", () => {
 
   document
     .getElementById(`${nextSong.path}-playlist-song`)
-    .querySelector(".util-btn-cell").style.color = "var(--yellow)";
+    .querySelector(".util-btn-cell").style.color = "var(--now-playing)";
   document
     .getElementById(`${nextSong.path}-playlist-song`)
-    .querySelector("h3").style.color = "var(--yellow)";
+    .querySelector("h3").style.color = "var(--now-playing)";
 
   if (state.isPlaying && state.currSong === nextSong) {
     state.setIsPlaying(false);
@@ -295,7 +295,7 @@ ui.forwardStepBtn.addEventListener("click", () => {
       .getElementById(`${nextSong.path}-playlist-song`)
       .querySelector("p").style.display = "block";
   } else {
-    ui.audio.src = `/audio_visualizer/audio/${nextSong.path}.mp3`;
+    ui.audio.src = `/audio/${nextSong.path}.mp3`;
 
     if (audioCtx.state === "suspended") audioCtx.resume();
 
@@ -304,7 +304,7 @@ ui.forwardStepBtn.addEventListener("click", () => {
 
     ui.audio.play();
 
-    ui.currSong.poster.src = `/audio_visualizer/posters/${nextSong.path}.webp`;
+    ui.currSong.poster.src = `/posters/${nextSong.path}.webp`;
     ui.currSong.poster.alt = `${nextSong.name} by ${nextSong.artist}`;
     ui.currSong.name.textContent = nextSong.name;
     ui.currSong.artist.textContent = nextSong.artist;
@@ -354,10 +354,10 @@ ui.backwardStepBtn.addEventListener("click", () => {
 
   document
     .getElementById(`${prevSong.path}-playlist-song`)
-    .querySelector(".util-btn-cell").style.color = "var(--yellow)";
+    .querySelector(".util-btn-cell").style.color = "var(--now-playing)";
   document
     .getElementById(`${prevSong.path}-playlist-song`)
-    .querySelector("h3").style.color = "var(--yellow)";
+    .querySelector("h3").style.color = "var(--now-playing)";
 
   if (state.isPlaying && state.currSong === prevSong) {
     state.setIsPlaying(false);
@@ -376,7 +376,7 @@ ui.backwardStepBtn.addEventListener("click", () => {
       .getElementById(`${prevSong.path}-playlist-song`)
       .querySelector("p").style.display = "block";
   } else {
-    ui.audio.src = `/audio_visualizer/audio/${prevSong.path}.mp3`;
+    ui.audio.src = `/audio/${prevSong.path}.mp3`;
 
     if (audioCtx.state === "suspended") audioCtx.resume();
 
@@ -385,7 +385,7 @@ ui.backwardStepBtn.addEventListener("click", () => {
 
     ui.audio.play();
 
-    ui.currSong.poster.src = `/audio_visualizer/posters/${prevSong.path}.webp`;
+    ui.currSong.poster.src = `/posters/${prevSong.path}.webp`;
     ui.currSong.poster.alt = `${prevSong.name} by ${prevSong.artist}`;
     ui.currSong.name.textContent = prevSong.name;
     ui.currSong.artist.textContent = prevSong.artist;
@@ -446,17 +446,24 @@ ui.makeSmallBtn.addEventListener("click", () => {
 
   if (state.isPlayerHidden) {
     ui.makeBigBtn.style.translate = "0 112px";
+    ui.makeSmallBtn.style.translate = "0 112px";
     ui.playlist.style.translate = "0 112px";
   }
 
+  ui.makeSmallBtn.style.display = "none";
   ui.makeBigBtn.style.display = "block";
   ui.makeBigBtn.style.animation = undefined;
+  ui.makeSmallBtn.style.animation = undefined;
   ui.playlist.style.animation =
     "getSmall 0.3s cubic-bezier(0.19, 1, 0.22, 1) forwards";
 });
 
 ui.makeBigBtn.addEventListener("click", () => {
   state.setIsPlaylistHidden(false);
+
+  setTimeout(() => {
+    ui.makeSmallBtn.style.display = "block";
+  }, 90);
 
   ui.playlist.style.animation =
     "getBig 0.3s cubic-bezier(0.19, 1, 0.22, 1) forwards";
@@ -467,14 +474,18 @@ ui.hideBtn.addEventListener("click", () => {
   state.setIsPlayerHidden(true);
 
   ui.showBtn.style.display = "block";
+  ui.hideBtn.style.display = "none";
 
   ui.player.style.animation = "2s hide cubic-bezier(0.19, 1, 0.22, 1) forwards";
+  ui.showBtn.style.animation = `2s slideDown cubic-bezier(0.19, 1, 0.22, 1) forwards`;
 
   if (state.isPlaylistHidden) {
     ui.playlist.style.translate = "0 112px";
+    ui.makeSmallBtn.style.translate = "0 112px";
     ui.makeBigBtn.style.animation = `2s slideDown cubic-bezier(0.19, 1, 0.22, 1) forwards`;
   } else {
     ui.playlist.style.animation = `2s slideDown cubic-bezier(0.19, 1, 0.22, 1) forwards`;
+    ui.makeSmallBtn.style.animation = `2s slideDown cubic-bezier(0.19, 1, 0.22, 1) forwards`;
     ui.makeBigBtn.style.translate = "0 112px";
   }
 });
@@ -483,16 +494,23 @@ ui.showBtn.addEventListener("click", () => {
   state.setIsPlayerHidden(false);
 
   ui.showBtn.style.display = "none";
+  ui.hideBtn.style.display = "block";
 
   ui.player.style.animation = "2s show cubic-bezier(0.19, 1, 0.22, 1) forwards";
+
+  ui.hideBtn.style.translate = "0";
+  ui.hideBtn.style.animation = `2s slideUp cubic-bezier(0.19, 1, 0.22, 1) forwards`;
 
   if (state.isPlaylistHidden) {
     ui.makeBigBtn.style.translate = "0";
     ui.makeBigBtn.style.animation = `2s slideUp cubic-bezier(0.19, 1, 0.22, 1) forwards`;
     ui.playlist.style.translate = "0";
+    ui.makeSmallBtn.style.translate = "0";
   } else {
     ui.playlist.style.translate = "0";
     ui.playlist.style.animation = `2s slideUp cubic-bezier(0.19, 1, 0.22, 1) forwards`;
+    ui.makeSmallBtn.style.translate = "0";
+    ui.makeSmallBtn.style.animation = `2s slideUp cubic-bezier(0.19, 1, 0.22, 1) forwards`;
     ui.makeBigBtn.style.translate = "0";
   }
 });
@@ -524,10 +542,10 @@ ui.playBtn.addEventListener("click", () => {
 
   document
     .getElementById(`${state.currSong.path}-playlist-song`)
-    .querySelector(".util-btn-cell").style.color = "var(--yellow)";
+    .querySelector(".util-btn-cell").style.color = "var(--now-playing)";
   document
     .getElementById(`${state.currSong.path}-playlist-song`)
-    .querySelector("h3").style.color = "var(--yellow)";
+    .querySelector("h3").style.color = "var(--now-playing)";
 });
 
 ui.pauseBtn.addEventListener("click", () => {
@@ -572,6 +590,57 @@ ui.mutedBtn.addEventListener("click", () => {
 
   toggleVolumeBtn();
 });
+
+const handleMicrophone = () => {
+  if (!audioCtx) {
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  }
+
+  if (!analyser) {
+    analyser = audioCtx.createAnalyser();
+  }
+
+  if (state.isLive) {
+    if (audioCtx.state === "suspended") audioCtx.resume();
+
+    audioSource.connect(analyser);
+
+    ui.playlist.style.display = "flex";
+    ui.player.style.display = "flex";
+    ui.hideBtn.style.display = "block";
+    ui.makeSmallBtn.style.display = "block";
+    ui.showBtn.style.display = "none";
+
+    state.setIsLive(false);
+  } else {
+    navigator.mediaDevices
+      .getUserMedia({ audio: true })
+      .then((stream) => {
+        audioSource = audioCtx.createMediaStreamSource(stream);
+        audioSource.connect(analyser);
+
+        if (audioCtx.state === "suspended") audioCtx.resume();
+
+        ui.playlist.style.display = "none";
+        ui.player.style.display = "none";
+        ui.hideBtn.style.display = "none";
+        ui.showBtn.style.display = "none";
+        ui.makeBigBtn.style.display = "none";
+        ui.makeSmallBtn.style.display = "none";
+
+        state.setScene("grid");
+        console.log(state.scene);
+        ui.audio.pause();
+        ui.audio.play();
+        state.setIsLive(true);
+      })
+      .catch((err) => {
+        console.error("Error accessing the microphone: ", err);
+      });
+  }
+};
+
+ui.fullScreenBtn.addEventListener("click", toggleFullScreen);
 
 // progress bar event handlers
 const songScrub = (event) => {
@@ -677,7 +746,7 @@ const initializeApp = () => {
     updateDurations();
   });
 
-  updateProgress(ui.volumeProgress, ui.audio.volume * 100);
+  updateProgress(ui.volumeProgress, ui.audio.volume * 60);
 
   initializeCurrSongData();
 };
@@ -697,10 +766,10 @@ songs.forEach((song) => {
       });
       document
         .getElementById(`${song.path}-playlist-song`)
-        .querySelector(".util-btn-cell").style.color = "var(--yellow)";
+        .querySelector(".util-btn-cell").style.color = "var(--now-playing)";
       document
         .getElementById(`${song.path}-playlist-song`)
-        .querySelector("h3").style.color = "var(--yellow)";
+        .querySelector("h3").style.color = "var(--now-playing)";
 
       if (state.isPlaying && state.currSong === song) {
         state.setIsPlaying(false);
@@ -719,7 +788,7 @@ songs.forEach((song) => {
           .getElementById(`${song.path}-playlist-song`)
           .querySelector("p").style.display = "block";
       } else {
-        ui.audio.src = `/audio_visualizer/audio/${song.path}.mp3`;
+        ui.audio.src = `/audio/${song.path}.mp3`;
 
         if (audioCtx.state === "suspended") audioCtx.resume();
 
@@ -728,7 +797,7 @@ songs.forEach((song) => {
 
         ui.audio.play();
 
-        ui.currSong.poster.src = `/audio_visualizer/posters/${song.path}.webp`;
+        ui.currSong.poster.src = `/posters/${song.path}.webp`;
         ui.currSong.poster.alt = `${song.name} by ${song.artist}`;
         ui.currSong.name.textContent = song.name;
         ui.currSong.artist.textContent = song.artist;
@@ -803,8 +872,16 @@ songs.forEach((song) => {
     });
 });
 
+function toggleFullScreen() {
+  if (!document.fullscreenElement) {
+    document.documentElement.requestFullscreen();
+  } else if (document.exitFullscreen) {
+    document.exitFullscreen();
+  }
+}
+
 const initializeCurrSongData = () => {
-  ui.currSong.poster.src = `/audio_visualizer/posters/${songs[0].path}.webp`;
+  ui.currSong.poster.src = `/posters/${songs[0].path}.webp`;
   ui.currSong.poster.alt = `${songs[0].name} by ${songs[0].artist}`;
   ui.currSong.name.textContent = `${songs[0].name}`;
   ui.currSong.artist.textContent = songs[0].artist;
@@ -837,30 +914,39 @@ const updateGridScene = () => {
       const pixelHeight = halfHeight / cnst.ROW_LEN;
       const pixelWidth = halfWidth / cnst.COL_LEN;
 
-      ctx.fillStyle = i < soundIntensity ? "#4300c0" : "#000000";
+      const baseHue = (Date.now() / 15) % 360;
+      const scaleFactor = 3;
+      const hue =
+        (baseHue +
+          ((i / (cnst.COL_LEN * scaleFactor)) * 360 +
+            (j / (cnst.ROW_LEN * scaleFactor)) * 360)) %
+        360;
 
-      ctx.fillRect(
+      const saturation = 70 + ((i + j) % 30);
+
+      ctx.strokeStyle =
+        i < soundIntensity ? `hsl(${hue}, ${saturation}%, 50%)` : "#000000";
+      ctx.lineWidth = 1;
+
+      ctx.strokeRect(
         (cnst.COL_LEN - j) * pixelWidth,
         (cnst.ROW_LEN - i) * pixelHeight,
         pixelWidth,
         pixelHeight
       );
-
-      ctx.fillRect(
+      ctx.strokeRect(
         halfWidth + j * pixelWidth,
         halfHeight + i * pixelHeight,
         pixelWidth,
         pixelHeight
       );
-
-      ctx.fillRect(
+      ctx.strokeRect(
         halfWidth + j * pixelWidth,
         (cnst.ROW_LEN - i) * pixelHeight,
         pixelWidth,
         pixelHeight
       );
-
-      ctx.fillRect(
+      ctx.strokeRect(
         (cnst.COL_LEN - j) * pixelWidth,
         halfHeight + i * pixelHeight,
         pixelWidth,
@@ -887,11 +973,15 @@ const updateBackgroundScene = () => {
     dataArray.reduce((acc, val) => acc + val, 0) / dataArray.length;
   const intensityRatio = avgIntensity / 255;
 
-  const centerColor = `rgb(
-    ${Math.floor(100 * intensityRatio)},
-    ${Math.floor(100 * intensityRatio)},
-    ${Math.floor(230 * intensityRatio)}
-  )`;
+  const baseHue = (Date.now() / 30) % 360;
+  const hue = (baseHue + 2) % 360;
+
+  const saturation = 100;
+  const lightness = 50 * intensityRatio;
+
+  const centerColor = `hsl(${Math.floor(hue)}, ${saturation}%, ${Math.floor(
+    lightness
+  )}%)`;
 
   const edgeColor = "#000000";
 
@@ -901,7 +991,7 @@ const updateBackgroundScene = () => {
     0,
     canvas.width / 2,
     canvas.height / 2,
-    canvas.width / 1.2
+    canvas.width / 1.5
   );
 
   gradient.addColorStop(0, centerColor);
@@ -931,8 +1021,35 @@ const updateWaveScene = () => {
 
   ctx.clearRect(0, 0, width, height);
 
-  ctx.strokeStyle = "#4300c0";
-  ctx.lineWidth = 5;
+  const generateControlPoints = (
+    direction,
+    offset,
+    amplitudeFactor,
+    frequency
+  ) => {
+    const points = [];
+    let upsideDown = false;
+    const incrementStep = 1;
+    const amplitudeThreshold = 10;
+
+    for (let i = 0; i < dataArray.length; i += incrementStep) {
+      const amplitude = (dataArray[i] / 255) * centerY * amplitudeFactor;
+      if (amplitude < amplitudeThreshold) continue;
+
+      let x, y;
+      if (!upsideDown) {
+        x = centerX + direction * (i / dataArray.length) * centerX;
+        y = centerY - amplitude + offset;
+        upsideDown = true;
+      } else {
+        x = centerX + direction * (i / dataArray.length) * centerX;
+        y = centerY + amplitude + offset;
+        upsideDown = false;
+      }
+      points.push({ x, y });
+    }
+    return points;
+  };
 
   const drawSmoothLine = (ctx, ctrl_points) => {
     const l = ctrl_points.length;
@@ -953,34 +1070,54 @@ const updateWaveScene = () => {
     ctx.stroke();
   };
 
-  const generateControlPoints = (direction) => {
-    const points = [];
-    let upsideDown = false;
+  const drawWave = (
+    direction,
+    offset,
+    amplitudeFactor,
+    frequency,
+    colorOffset,
+    lineWidth,
+    shadowColor
+  ) => {
+    const leftControlPoints = generateControlPoints(
+      direction,
+      offset,
+      amplitudeFactor,
+      frequency
+    );
+    const rightControlPoints = generateControlPoints(
+      -direction,
+      offset,
+      amplitudeFactor,
+      frequency
+    );
 
-    for (let i = 0; i < dataArray.length; i += 8) {
-      let x, y;
-      if (!upsideDown) {
-        x = centerX + direction * (i / dataArray.length) * centerX;
-        y = centerY - (dataArray[i] / 255) * centerY * 0.9;
-        upsideDown = true;
-      } else {
-        x = centerX + direction * (i / dataArray.length) * centerX;
-        y = centerY + (dataArray[i] / 255) * centerY * 0.9;
-        upsideDown = false;
-      }
-      points.push({ x, y });
-    }
-    return points;
+    const baseHue = (Date.now() / 15) % 360;
+    const hue = (baseHue + colorOffset) % 360;
+    const gradient = ctx.createLinearGradient(
+      0,
+      0,
+      canvas.width,
+      canvas.height
+    );
+    gradient.addColorStop(0, `hsl(${hue}, 100%, 50%)`);
+    gradient.addColorStop(1, `hsl(${(hue + 120) % 360}, 100%, 50%)`);
+    ctx.strokeStyle = gradient;
+
+    ctx.shadowColor = shadowColor;
+    ctx.shadowBlur = 2;
+    ctx.lineWidth = lineWidth;
+
+    drawSmoothLine(ctx, leftControlPoints);
+    drawSmoothLine(ctx, rightControlPoints);
   };
 
-  const upperLeftControlPoints = generateControlPoints(-1, false);
-  const upperRightControlPoints = generateControlPoints(1, false);
-
-  drawSmoothLine(ctx, upperLeftControlPoints);
-  drawSmoothLine(ctx, upperRightControlPoints);
+  drawWave(1, 0, 0.7, 1, 0, 1, "rgba(255, 255, 255, 0.5)");
 
   if (state.scene === "waves") {
     animationRequestId = requestAnimationFrame(updateWaveScene);
+  } else {
+    cancelAnimationFrame(animationRequestId);
   }
 };
 

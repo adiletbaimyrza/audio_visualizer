@@ -26,11 +26,11 @@
     />
     <meta
       property="og:image"
-      content="https://adiletbaimyrza.github.io/audio_visualizer/blob/screenshot.png"
+      content="https://adiletbaimyrza.github.io/blob/screenshot.png"
     />
     <meta
       property="og:url"
-      content="https://adiletbaimyrza.github.io/audio_visualizer/blob/screenshot.png"
+      content="https://adiletbaimyrza.github.io/blob/screenshot.png"
     />
 
     <!-- meta: twitter card, title, description, image -->
@@ -45,7 +45,7 @@
     />
     <meta
       name="twitter:image"
-      content="https://adiletbaimyrza.github.io/audio_visualizer/blob/screenshot.png"
+      content="https://adiletbaimyrza.github.io/blob/screenshot.png"
     />
 
     <!-- tab icon -->
@@ -54,6 +54,7 @@
       type="image/svg+xml"
       href="/audio_visualizer/svg/headphones.svg"
     />
+
 
     <!-- title -->
     <title>Audio Equalizer</title>
@@ -80,48 +81,30 @@
         <div class="controls">
           <div class="controls__btns">
             <button type="button" id="backward-step-btn" class="controls-btn">
-              <img
-                src="/audio_visualizer/svg/backward-step.svg"
-                alt="backward-step icon"
-              />
+              <img src="/svg/backward-step.svg" alt="backward-step icon" />
             </button>
             <button id="backward-btn" type="button" class="controls-btn">
-              <img
-                src="/audio_visualizer/svg/backward.svg"
-                alt="backward-step icon"
-              />
+              <img src="/svg/backward.svg" alt="backward-step icon" />
             </button>
             <button
               id="play-btn"
               type="button"
               class="controls-btn playback-btn"
             >
-              <img
-                src="/audio_visualizer/svg/circle-play.svg"
-                alt="play icon"
-              />
+              <img src="/svg/circle-play.svg" alt="play icon" />
             </button>
             <button
               id="pause-btn"
               type="button"
               class="controls-btn playback-btn"
             >
-              <img
-                src="/audio_visualizer/svg/circle-pause.svg"
-                alt="pause icon"
-              />
+              <img src="/svg/circle-pause.svg" alt="pause icon" />
             </button>
             <button id="forward-btn" type="button" class="controls-btn">
-              <img
-                src="/audio_visualizer/svg/forward.svg"
-                alt="forward-step icon"
-              />
+              <img src="/svg/forward.svg" alt="forward-step icon" />
             </button>
             <button type="button" id="forward-step-btn" class="controls-btn">
-              <img
-                src="/audio_visualizer/svg/forward-step.svg"
-                alt="forward-step icon"
-              />
+              <img src="/svg/forward-step.svg" alt="forward-step icon" />
             </button>
           </div>
 
@@ -136,44 +119,39 @@
 
         <div class="volume">
           <button id="volume-high-btn">
-            <img
-              src="/audio_visualizer/svg/volume-high.svg"
-              alt="volume high icon"
-            />
+            <img src="/svg/volume-high.svg" alt="volume high icon" />
           </button>
           <button id="muted-btn">
-            <img
-              src="/audio_visualizer/svg/volume-xmark.svg"
-              alt="muted icon"
-            />
+            <img src="/svg/volume-xmark.svg" alt="muted icon" />
           </button>
 
           <div id="volume-progress" class="progress">
             <div class="progress-filled"></div>
           </div>
         </div>
-
-        <button type="button" id="hide-btn">
-          Hide player<img src="/audio_visualizer/svg/caret-down.svg" />
-        </button>
       </section>
 
       <!-- playlist initializes in main.js -->
       <table id="playlist" class="playlist"></table>
 
       <button id="make-big-btn" type="button" title="Show playlist">
-        Show Playlist
+        Show playlist
+      </button>
+      <button id="make-small-btn" type="button" title="Show playlist">
+        Hide playlist
       </button>
 
       <button id="show-btn" type="button">Show player</button>
+      <button type="button" id="hide-btn">Hide player</button>
 
       <section id="vis-change-btns">
+        <button type="button" id="full-screen-btn">Full Screen</button>
         <button type="button" id="canvas-rect-grid">Grid</button>
         <button type="button" id="canvas-lines">Waves</button>
         <button type="button" id="three-d-sphere">Flash</button>
       </section>
 
-      <audio id="audio" src="/audio_visualizer/audio/adele.mp3"></audio>
+      <audio id="audio" src="/audio/adele.mp3"></audio>
     </main>
   </body>
 
