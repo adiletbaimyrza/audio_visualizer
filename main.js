@@ -641,7 +641,6 @@ const handleMicrophone = () => {
 };
 
 ui.fullScreenBtn.addEventListener("click", toggleFullScreen);
-ui.microphoneBtn.addEventListener("click", handleMicrophone);
 
 // progress bar event handlers
 const songScrub = (event) => {
