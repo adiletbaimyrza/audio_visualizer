@@ -304,7 +304,7 @@ ui.forwardStepBtn.addEventListener("click", () => {
 
     ui.audio.play();
 
-    ui.currSong.poster.src = `/posters/${nextSong.path}.webp`;
+    ui.currSong.poster.src = `/audio_visualizer/posters/${nextSong.path}.webp`;
     ui.currSong.poster.alt = `${nextSong.name} by ${nextSong.artist}`;
     ui.currSong.name.textContent = nextSong.name;
     ui.currSong.artist.textContent = nextSong.artist;
@@ -385,7 +385,7 @@ ui.backwardStepBtn.addEventListener("click", () => {
 
     ui.audio.play();
 
-    ui.currSong.poster.src = `/posters/${prevSong.path}.webp`;
+    ui.currSong.poster.src = `/audio_visualizer/posters/${prevSong.path}.webp`;
     ui.currSong.poster.alt = `${prevSong.name} by ${prevSong.artist}`;
     ui.currSong.name.textContent = prevSong.name;
     ui.currSong.artist.textContent = prevSong.artist;
@@ -797,7 +797,7 @@ songs.forEach((song) => {
 
         ui.audio.play();
 
-        ui.currSong.poster.src = `/posters/${song.path}.webp`;
+        ui.currSong.poster.src = `/audio_visualizer/posters/${song.path}.webp`;
         ui.currSong.poster.alt = `${song.name} by ${song.artist}`;
         ui.currSong.name.textContent = song.name;
         ui.currSong.artist.textContent = song.artist;
@@ -881,7 +881,7 @@ function toggleFullScreen() {
 }
 
 const initializeCurrSongData = () => {
-  ui.currSong.poster.src = `/posters/${songs[0].path}.webp`;
+  ui.currSong.poster.src = `/audio_visualizer/posters/${songs[0].path}.webp`;
   ui.currSong.poster.alt = `${songs[0].name} by ${songs[0].artist}`;
   ui.currSong.name.textContent = `${songs[0].name}`;
   ui.currSong.artist.textContent = songs[0].artist;
